@@ -118,3 +118,74 @@ export async function syncSubscriptionForCustomer(customerId: string): Promise<v
     { onConflict: "user_id" },
   );
 }
+
+/**
+ * Provisionne (idempotent) un compte abonné à partir d'une session Checkout
+ * payée — y compris en « paiement direct » (sans connexion préalable).
+ *
+ * Identité : `metadata.supabase_user_id` si présent (flux connecté), sinon
+ * l'email collecté par Stripe (flux anonyme). Retrouve ou crée l'utilisateur
+ * Supabase, lie le client Stripe à son profil, puis synchronise l'abonnement.
+ * Renvoie l'email associé (pour l'écran de bienvenue), ou null.
+ */
+export async function provisionAccountFromSession(
+  session: Stripe.Checkout.Session,
+): Promise<string | null> {
+  const email =
+    (session.customer_details?.email ?? session.customer_email ?? "")
+      .trim()
+      .toLowerCase() || null;
+  const customerId =
+    typeof session.customer === "string"
+      ? session.customer
+      : session.customer?.id ?? null;
+  if (!customerId) return email;
+
+  const admin = createAdminClient();
+
+  // 1) Identité : metadata (flux connecté) ou email (flux anonyme).
+  let userId = session.metadata?.supabase_user_id ?? null;
+
+  if (!userId && email) {
+    // Compte déjà existant pour cet email ? (profil créé à l'inscription)
+    const { data: existing } = await admin
+      .from("profiles")
+      .select("id")
+      .eq("email", email)
+      .maybeSingle();
+
+    if (existing?.id) {
+      userId = existing.id as string;
+    } else {
+      // Création d'un compte sans mot de passe, email confirmé (le paiement
+      // fait foi). L'accès se fera par lien magique depuis l'écran /bienvenue.
+      const { data: created } = await admin.auth.admin.createUser({
+        email,
+        email_confirm: true,
+      });
+      userId = created?.user?.id ?? null;
+      if (!userId) {
+        // Course possible (créé entre-temps par le webhook) : relecture.
+        const { data: again } = await admin
+          .from("profiles")
+          .select("id")
+          .eq("email", email)
+          .maybeSingle();
+        userId = (again?.id as string) ?? null;
+      }
+    }
+  }
+
+  if (!userId) return email;
+
+  // 2) Lier le client Stripe au profil (clé de la synchro d'abonnement).
+  await admin
+    .from("profiles")
+    .update({ stripe_customer_id: customerId })
+    .eq("id", userId);
+
+  // 3) Synchroniser l'abonnement réel depuis Stripe vers Supabase.
+  await syncSubscriptionForCustomer(customerId);
+
+  return email;
+}

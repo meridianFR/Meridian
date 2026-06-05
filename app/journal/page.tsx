@@ -1068,12 +1068,15 @@ export default function JournalMarketing() {
                       </li>
                     ))}
                   </ul>
-                  <Link
-                    href={`/abonnement?plan=${p.plan}`}
-                    className={`btn ${p.primary ? "btn-primary" : "btn-ghost"} w-full justify-center`}
-                  >
-                    {p.cta}
-                  </Link>
+                  <form method="post" action="/api/checkout">
+                    <input type="hidden" name="plan" value={p.plan} />
+                    <button
+                      type="submit"
+                      className={`btn ${p.primary ? "btn-primary" : "btn-ghost"} w-full justify-center`}
+                    >
+                      {p.cta}
+                    </button>
+                  </form>
                 </div>
               </Reveal>
             ))}

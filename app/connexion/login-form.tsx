@@ -6,8 +6,8 @@ import { sanitizeNextPath } from "@/lib/security";
 
 type Status = "idle" | "loading" | "sent" | "error";
 
-export function LoginForm({ next }: { next: string }) {
-  const [email, setEmail] = useState("");
+export function LoginForm({ next, defaultEmail = "" }: { next: string; defaultEmail?: string }) {
+  const [email, setEmail] = useState(defaultEmail);
   const [status, setStatus] = useState<Status>("idle");
   const [message, setMessage] = useState("");
 

@@ -34,32 +34,45 @@ export async function POST(request: Request) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) {
-    const next = encodeURIComponent(`/abonnement?plan=${plan}`);
-    return NextResponse.redirect(new URL(`/connexion?next=${next}`, SITE_URL), 303);
-  }
-
-  // Déjà abonné : inutile de repayer.
-  const existing = await getSubscription(supabase, user.id);
-  if (isActive(existing)) {
-    return NextResponse.redirect(new URL("/app", SITE_URL), 303);
-  }
 
   try {
-    const customerId = await getOrCreateCustomer(user);
+    if (user) {
+      // ── Flux connecté : client Stripe rattaché à l'utilisateur ──
+      // Déjà abonné : inutile de repayer.
+      const existing = await getSubscription(supabase, user.id);
+      if (isActive(existing)) {
+        return NextResponse.redirect(new URL("/app", SITE_URL), 303);
+      }
+      const customerId = await getOrCreateCustomer(user);
+      const session = await getStripe().checkout.sessions.create({
+        mode: "subscription",
+        customer: customerId,
+        line_items: [{ price: stripePriceId(plan), quantity: 1 }],
+        allow_promotion_codes: true,
+        billing_address_collection: "auto",
+        success_url: `${SITE_URL}/app?checkout=success`,
+        cancel_url: `${SITE_URL}/abonnement?plan=${plan}&canceled=1`,
+        client_reference_id: user.id,
+        metadata: { supabase_user_id: user.id, plan },
+        subscription_data: { metadata: { supabase_user_id: user.id, plan } },
+      });
+      if (!session.url) throw new Error("URL de session Checkout manquante");
+      return NextResponse.redirect(session.url, 303);
+    }
+
+    // ── Flux anonyme (paiement direct) ──
+    // Pas de connexion préalable : Stripe Checkout collecte l'email et le moyen
+    // de paiement. Le compte est créé/lié après paiement (webhook + /bienvenue).
     const session = await getStripe().checkout.sessions.create({
       mode: "subscription",
-      customer: customerId,
       line_items: [{ price: stripePriceId(plan), quantity: 1 }],
       allow_promotion_codes: true,
       billing_address_collection: "auto",
-      success_url: `${SITE_URL}/app?checkout=success`,
-      cancel_url: `${SITE_URL}/abonnement?plan=${plan}&canceled=1`,
-      client_reference_id: user.id,
-      metadata: { supabase_user_id: user.id, plan },
-      subscription_data: { metadata: { supabase_user_id: user.id, plan } },
+      success_url: `${SITE_URL}/bienvenue?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${SITE_URL}/journal#tarifs`,
+      metadata: { plan },
+      subscription_data: { metadata: { plan } },
     });
-
     if (!session.url) throw new Error("URL de session Checkout manquante");
     return NextResponse.redirect(session.url, 303);
   } catch (e) {

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
-import { getStripe, syncSubscriptionForCustomer } from "@/lib/stripe";
+import { getStripe, syncSubscriptionForCustomer, provisionAccountFromSession } from "@/lib/stripe";
 import { stripeWebhookSecret } from "@/lib/env";
 
 export const runtime = "nodejs";
@@ -36,13 +36,9 @@ export async function POST(request: Request) {
   try {
     switch (event.type) {
       case "checkout.session.completed": {
+        // Paiement direct comme connecté : crée/lie le compte puis synchronise.
         const session = event.data.object as Stripe.Checkout.Session;
-        const customer = session.customer;
-        if (customer) {
-          await syncSubscriptionForCustomer(
-            typeof customer === "string" ? customer : customer.id,
-          );
-        }
+        await provisionAccountFromSession(session);
         break;
       }
       case "customer.subscription.created":
