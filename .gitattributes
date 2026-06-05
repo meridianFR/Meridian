@@ -1,0 +1,3 @@
+# Normalise les fins de ligne : LF dans le dépôt, sur Mac comme sur Windows.
+# Évite le bruit de diff quand on alterne entre les deux OS.
+* text=auto eol=lf
