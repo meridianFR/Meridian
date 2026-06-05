@@ -42,7 +42,7 @@ normalement et `/app` redirige vers `/connexion` (barrière active par défaut).
 4. **Authentication → URL Configuration** :
    - *Site URL* : `http://localhost:3000` (puis l'URL de prod plus tard).
    - *Redirect URLs* : ajoute `http://localhost:3000/auth/callback`
-     (et `https://meridian.app/auth/callback` pour la prod).
+     (et `https://meridiandata.fr/auth/callback` pour la prod).
 5. (Optionnel) **Authentication → Email Templates** : personnalise le mail de lien magique.
 
 > En dev, Supabase peut limiter l'envoi d'emails. Pour tester sans email, tu peux
@@ -66,7 +66,7 @@ normalement et `/app` redirige vers `/connexion` (barrière active par défaut).
 5. **Webhook** :
    - En local : voir l'étape D (Stripe CLI fournit le secret).
    - En prod : **Developers → Webhooks → Add endpoint** →
-     URL `https://meridian.app/api/stripe/webhook`, événements :
+     URL `https://meridiandata.fr/api/stripe/webhook`, événements :
      `checkout.session.completed`, `customer.subscription.created`,
      `customer.subscription.updated`, `customer.subscription.deleted`.
      Copie le **Signing secret** (`whsec_…`) → `STRIPE_WEBHOOK_SECRET`.
@@ -148,7 +148,7 @@ npm run dev
 
 ## 8. Passage en production
 
-1. `NEXT_PUBLIC_SITE_URL=https://meridian.app`.
+1. `NEXT_PUBLIC_SITE_URL=https://meridiandata.fr`.
 2. Bascule Stripe en **mode Live**, recrée les 2 prix, récupère les clés `sk_live_…`.
 3. Crée l'endpoint webhook **prod** (`/api/stripe/webhook`) → `whsec_…` live.
 4. Ajoute l'URL de redirection **prod** dans Supabase (`/auth/callback`).

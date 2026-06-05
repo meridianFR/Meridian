@@ -85,7 +85,7 @@ export default function Page() {
           <section>
             <h2 className="text-xl font-semibold tracking-tight mb-4">Contact</h2>
             <p className="text-ink-mute">
-              Adresse de contact à publier — contact@meridian.app (placeholder).
+              Pour toute question relative au site : meridianFR@hotmail.com
             </p>
           </section>
         </div>

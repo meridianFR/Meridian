@@ -650,7 +650,7 @@ export function WeeklyReportDrawer({ report, onClose }: { report: WeeklyReport |
             <CardLabel className="mb-2">Objet</CardLabel>
             <h3 className="text-lg font-semibold tracking-tight leading-snug">{report.subject}</h3>
             <div className="text-[11px] text-ink-faint mono mt-1">
-              meridian@meridian.app · dimanche · {report.period}
+              meridianFR@hotmail.com · dimanche · {report.period}
             </div>
           </div>
 

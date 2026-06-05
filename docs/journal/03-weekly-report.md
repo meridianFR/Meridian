@@ -231,4 +231,4 @@ Rédige le report.
 - **Pas de tracking pixel agressif** (ouverture OK pour métrique rétention, pas de heatmap intrusive)
 - **Lien unique** en bas : "Voir cette semaine dans ton journal →" vers écran 05
 - **Archivé** dans l'app (écran 05), consultable et re-téléchargeable en PDF
-- **Expéditeur** : `meridian@meridian.app`, nom "Meridian", reply-to actif (un humain lit les réponses — signal de rétention fort)
+- **Expéditeur** : `meridianFR@hotmail.com`, nom "Meridian", reply-to actif (un humain lit les réponses — signal de rétention fort)

@@ -907,7 +907,7 @@ export default function JournalMarketing() {
             <Reveal as="div" className="lg:col-span-7" delay={120}>
               <div className="glow-border rounded-2xl bg-black/40 backdrop-blur-sm overflow-hidden">
                 <div className="px-6 py-4 border-b border-border flex items-center justify-between">
-                  <span className="mono text-[11px] text-ink-mute">meridian@meridian.app</span>
+                  <span className="mono text-[11px] text-ink-mute">meridianFR@hotmail.com</span>
                   <span className="mono text-[10px] uppercase tracking-[0.2em] text-ink-faint">Weekly Report · S21</span>
                 </div>
                 <div className="p-6 md:p-7 space-y-4">
