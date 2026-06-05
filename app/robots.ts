@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-const BASE = "https://meridian.app";
+const BASE = "https://meridiandata.fr";
 
 export default function robots(): MetadataRoute.Robots {
   return {

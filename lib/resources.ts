@@ -373,4 +373,4 @@ export function latestArticles(limit = 6): Article[] {
     .slice(0, limit);
 }
 
-export const BASE_URL = "https://meridian.app";
+export const BASE_URL = "https://meridiandata.fr";

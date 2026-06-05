@@ -11,12 +11,12 @@ export const metadata: Metadata = {
   },
   description:
     "Outils et stratégies pour traders qui veulent durer, pas exploser. Aucune promesse de gain. Aucun signal. Aucun guru.",
-  metadataBase: new URL("https://meridian.app"),
+  metadataBase: new URL("https://meridiandata.fr"),
   openGraph: {
     title: "Meridian ° — Trade ce que tu mesures.",
     description:
       "Outils et stratégies pour traders qui veulent durer, pas exploser.",
-    url: "https://meridian.app",
+    url: "https://meridiandata.fr",
     siteName: "Meridian °",
     locale: "fr_FR",
     type: "website",
@@ -32,20 +32,20 @@ const jsonLd = {
   "@graph": [
     {
       "@type": "Organization",
-      "@id": "https://meridian.app/#organization",
+      "@id": "https://meridiandata.fr/#organization",
       name: "Meridian",
-      url: "https://meridian.app",
-      logo: "https://meridian.app/apple-icon",
+      url: "https://meridiandata.fr",
+      logo: "https://meridiandata.fr/apple-icon",
       description:
         "Outils et stratégies pour traders qui veulent durer, pas exploser.",
     },
     {
       "@type": "WebSite",
-      "@id": "https://meridian.app/#website",
+      "@id": "https://meridiandata.fr/#website",
       name: "Meridian",
-      url: "https://meridian.app",
+      url: "https://meridiandata.fr",
       inLanguage: "fr-FR",
-      publisher: { "@id": "https://meridian.app/#organization" },
+      publisher: { "@id": "https://meridiandata.fr/#organization" },
     },
   ],
 };

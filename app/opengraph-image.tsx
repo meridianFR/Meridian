@@ -85,7 +85,7 @@ export default function Image() {
             Meridian
             <span style={{ color: "#8a8a8a", marginLeft: 4 }}>°</span>
           </div>
-          <div style={{ display: "flex", fontSize: 24, color: "#8a8a8a" }}>meridian.app</div>
+          <div style={{ display: "flex", fontSize: 24, color: "#8a8a8a" }}>meridiandata.fr</div>
         </div>
       </div>
     ),

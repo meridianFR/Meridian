@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { STRATEGIES } from "@/lib/strategies";
 import { PILLARS, ARTICLES } from "@/lib/resources";
 
-const BASE = "https://meridian.app";
+const BASE = "https://meridiandata.fr";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
