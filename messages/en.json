@@ -1,0 +1,219 @@
+{
+  "Language": {
+    "label": "Language",
+    "fr": "Français",
+    "en": "English",
+    "pt": "Português",
+    "switchTo": "Switch to {language}"
+  },
+  "Nav": {
+    "strategies": "Strategies",
+    "tools": "Tools",
+    "journal": "Journal",
+    "faq": "FAQ",
+    "formation": "Courses",
+    "about": "About",
+    "login": "Log in",
+    "cta": "Our courses",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
+  },
+  "Footer": {
+    "tagline": "Tools and strategies for traders who want to last, not blow up.",
+    "badge": "° Tools & strategies · v0.1",
+    "colProduct": "Product",
+    "colBrand": "Brand",
+    "colLegal": "Legal",
+    "strategies": "Strategies",
+    "tools": "Tools",
+    "journal": "Journal",
+    "formation": "Courses",
+    "faq": "FAQ",
+    "about": "About",
+    "ecosystem": "Ecosystem",
+    "legalNotice": "Legal notice",
+    "terms": "Terms",
+    "disclaimer": "Disclaimer",
+    "disclaimerText": "Meridian does not provide any investment advice. Educational content only. Trading carries a risk of capital loss. Past performance is no guarantee of future results.",
+    "copyright": "© 2026 Meridian °",
+    "legalLinks": "Legal · Terms · Disclaimer"
+  },
+  "Home": {
+    "marquee": [
+      "Documented strategies",
+      "Position calculator",
+      "Risk calculator",
+      "Trading journal",
+      "Pre-trade checklist",
+      "Methodical training"
+    ],
+    "heroEyebrow": "° Meridian — 2026",
+    "heroTitle": "Trade what<br></br>you <em>measure.</em>",
+    "heroLead": "Tools and strategies for serious traders. No signals. No promises. A method.",
+    "heroCtaPrimary": "Explore the strategies",
+    "heroCtaSecondary": "See the tools",
+    "statTools": "Tools",
+    "statStrategies": "Strategies",
+    "statMarket": "Market",
+    "statMarketValue": "FR",
+    "pillarsEyebrow": "° Three pillars",
+    "pillarsTitle": "Three axes,<br></br><em>one method.</em>",
+    "pillarsLead": "Measure, structure, understand. Each pillar stands on its own, yet fits into one coherent approach.",
+    "pillarStrategiesEyebrow": "01 — Strategies",
+    "pillarStrategiesTitle": "Structured methods",
+    "pillarStrategiesDesc": "Generic, documented setups with no promises. Readable, testable, adaptable.",
+    "pillarStrategiesCta": "Explore",
+    "pillarToolsEyebrow": "02 — Tools",
+    "pillarToolsTitle": "Calculator & Journal",
+    "pillarToolsDesc": "A position calculator and a trading journal. Calculate before. Measure after.",
+    "pillarToolsCta": "See the tools",
+    "pillarFormationEyebrow": "03 — Courses",
+    "pillarFormationTitle": "Learn the right way",
+    "pillarFormationDesc": "Teaching without hype. Understand what you trade, measure what you do.",
+    "pillarFormationCta": "Discover",
+    "approachEyebrow": "° Approach",
+    "approachTitle": "No hype.<br></br><em>A discipline.</em>",
+    "approachBodyLead": "Meridian is not a signal service or a school of gurus.",
+    "approachBodyRest": " It is generic tools and strategies, built to measure, instil discipline and last — beyond the next cycle.",
+    "approachCard1Key": "Approach",
+    "approachCard1Value": "Methodical",
+    "approachCard1Desc": "No improvisation.",
+    "approachCard2Key": "Stance",
+    "approachCard2Value": "Generic",
+    "approachCard2Desc": "No signals.",
+    "approachCard3Key": "Horizon",
+    "approachCard3Value": "Long-term",
+    "approachCard3Desc": "No promises.",
+    "ecosystemEyebrow": "° The ecosystem",
+    "ecosystemTitle": "Everything Meridian<br></br><em>puts in your hands.</em>",
+    "ecosystemLead": "Four building blocks, one logic: calculate before, measure after, and progress on measurable ground.",
+    "toolStrategyTag": "Strategy",
+    "toolStrategyTitle": "Setups you can measure",
+    "toolStrategyDesc": "Entry, stop, target: every setup is documented, generic and testable. You know why you enter — and where you exit.",
+    "toolStrategyCta": "See the strategies",
+    "toolCalculatorTag": "Calculator",
+    "toolCalculatorTitle": "Position size, without error",
+    "toolCalculatorDesc": "Capital, risk, stop: the calculator gives you the exact lot to trade. You calibrate your risk before pulling the trigger.",
+    "toolCalculatorCta": "Open the calculator",
+    "toolJournalTag": "Journal",
+    "toolJournalTitle": "Measure what you actually do",
+    "toolJournalDesc": "Every trade logged, your equity curve, your statistics. The journal turns your history into decisions.",
+    "toolJournalCta": "Discover the journal",
+    "toolFormationTag": "Courses",
+    "toolFormationTitle": "Learn the right way, step by step",
+    "toolFormationDesc": "Progressive modules, no hype: understand what you trade before risking a cent. A discipline-first approach.",
+    "toolFormationCta": "Take the courses"
+  },
+  "Placeholder": {
+    "statusDraft": "IN PROGRESS",
+    "statusSoon": "COMING SOON",
+    "statusLive": "LIVE",
+    "underConstruction": "Page under construction",
+    "roadmapNote": "Content will be published according to the Meridian roadmap.",
+    "back": "Back"
+  },
+  "Ecosystem": {
+    "sectionLabel": "Vision · Ecosystem",
+    "title": "One ecosystem.",
+    "shimmer": "One data layer.",
+    "subtitle": "The calculator and the journal are the two building blocks of a single system. Calculate before the trade. Measure after."
+  },
+  "About": {
+    "sectionLabel": "About · Meridian °",
+    "title": "Who.",
+    "shimmer": "Why.",
+    "subtitle": "A short bio, the approach, public positions. No growth bro. No founder telling you how much he makes."
+  },
+  "Manifesto": {
+    "sectionLabel": "Manifesto · Meridian °",
+    "title": "Trading is not a game.",
+    "shimmer": "It is a discipline.",
+    "subtitle": "Why Meridian exists. Who is behind it. The personal audit of 1,400 trades. The full text is coming here."
+  },
+  "ToolChecklist": {
+    "sectionLabel": "Tool · Free",
+    "shimmer": "Checklist.",
+    "subtitle": "Ten questions to ask before every entry. Interactive format, local save, printable PDF export.",
+    "backLabel": "All tools"
+  },
+  "ToolJournal": {
+    "sectionLabel": "Tool · Paid · Flagship",
+    "shimmer": "Journal.",
+    "subtitle": "The operating system of the serious trader. Automated journal, measured edge, Weekly Behavioral Report every Sunday.",
+    "backLabel": "All tools"
+  },
+  "ToolAudit": {
+    "sectionLabel": "Tool · Free · Lead gen",
+    "shimmer": "Audit.",
+    "subtitle": "Upload your history. The tool identifies your profitable hours, your error patterns, your variance. One free audit.",
+    "backLabel": "All tools"
+  },
+  "Faq": {
+    "metaTitle": "FAQ",
+    "metaDescription": "Frequently asked questions about Meridian, its tools and its strategies.",
+    "eyebrow": "° FAQ",
+    "titleLine1": "Frequently asked",
+    "titleEmph": "questions.",
+    "lead": "The questions that keep coming up. Short answers, no detours.",
+    "contactPrefix": "A question that is not listed? ",
+    "contactLink": "Check the legal framework first →",
+    "items": [
+      {
+        "q": "Does Meridian give trading signals?",
+        "a": "No. No signals, no alerts, no buy or sell recommendations. Meridian offers methodological tools and generic strategies to structure your approach."
+      },
+      {
+        "q": "Is this investment advice?",
+        "a": "No. Meridian is not a registered investment adviser. All content is educational and stays within the scope of general guidance (French AMF position DOC-2008-23)."
+      },
+      {
+        "q": "Who is Meridian for?",
+        "a": "For traders who are past the 'learning which buttons to press' phase and want to structure a durable approach: journaling, risk management, method, audit."
+      },
+      {
+        "q": "Which markets are covered?",
+        "a": "Meridian's tools and strategies are generic. They apply to most liquid markets: forex, indices, stocks, futures, crypto. The examples are deliberately neutral."
+      },
+      {
+        "q": "What is free, what is paid?",
+        "a": "The documented strategies and some basic tools are free. The premium tools (full journal, advanced audit, training modules) will be paid as they are released."
+      },
+      {
+        "q": "Is there a Discord or community?",
+        "a": "Not for now. Meridian is a suite of tools and content, not a community. The goal is autonomy, not dependence on a group."
+      },
+      {
+        "q": "Can I expect guaranteed results?",
+        "a": "No. No tool, method or strategy guarantees results. Trading carries a risk of capital loss. See the financial disclaimer."
+      }
+    ]
+  },
+  "Formation": {
+    "metaTitle": "Courses",
+    "metaDescription": "Meridian course modules — understand, measure and structure your trading approach.",
+    "eyebrow": "° Courses",
+    "titleLine1": "Learn",
+    "titleEmph": "the right way.",
+    "lead": "Teaching without hype. No income promises, no magic recipe. The building blocks to understand what you trade and measure what you do.",
+    "soon": "Soon",
+    "footerPrefix": "The Meridian course is under construction. ",
+    "footerLink": "In the meantime, explore the strategies →",
+    "modules": [
+      {
+        "eyebrow": "Module 01",
+        "title": "Fundamentals",
+        "desc": "Market reading, structure, context. Building an analysis framework."
+      },
+      {
+        "eyebrow": "Module 02",
+        "title": "Risk & position sizing",
+        "desc": "Sizing, stop, drawdown. What sets apart the trader who lasts."
+      },
+      {
+        "eyebrow": "Module 03",
+        "title": "Journal & audit",
+        "desc": "Measure what you do. Identify your edge. Correct your biases."
+      }
+    ]
+  }
+}

@@ -1,22 +1,24 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
+import { Link, usePathname } from "@/i18n/navigation";
+import { LanguageSwitcher } from "@/components/language-switcher";
 
 const NAV_ITEMS = [
-  { href: "/strategies", label: "Stratégies" },
-  { href: "/outils", label: "Outils" },
-  { href: "/journal", label: "Journal" },
-];
+  { href: "/strategies", key: "strategies" },
+  { href: "/outils", key: "tools" },
+  { href: "/journal", key: "journal" },
+] as const;
 
 const MOBILE_SECONDARY = [
-  { href: "/faq", label: "FAQ" },
-  { href: "/formation", label: "Formation" },
-  { href: "/a-propos", label: "À propos" },
-];
+  { href: "/faq", key: "faq" },
+  { href: "/formation", key: "formation" },
+  { href: "/a-propos", key: "about" },
+] as const;
 
 export function Nav() {
+  const t = useTranslations("Nav");
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -85,7 +87,7 @@ export function Nav() {
                       : "text-ink-mute hover:text-white hover:bg-white/[0.04]"
                   }`}
                 >
-                  {item.label}
+                  {t(item.key)}
                 </Link>
               );
             })}
@@ -101,15 +103,20 @@ export function Nav() {
                 : "text-ink-mute hover:text-white hover:bg-white/[0.04]"
             }`}
           >
-            Connexion
+            {t("login")}
           </Link>
+
+          {/* Sélecteur de langue (desktop) */}
+          <div className="hidden md:block">
+            <LanguageSwitcher />
+          </div>
 
           {/* CTA principal — toujours visible */}
           <Link
             href="/formation"
             className="group ml-1.5 inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 sm:px-4 py-1.5 font-medium text-black shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_8px_24px_-14px_rgba(255,255,255,0.5)] transition-transform duration-300 hover:-translate-y-px"
           >
-            Nos formations
+            {t("cta")}
             <span
               aria-hidden
               className="hidden sm:inline text-black/50 transition-transform duration-300 group-hover:translate-x-0.5"
@@ -122,7 +129,7 @@ export function Nav() {
           <button
             type="button"
             onClick={() => setMenuOpen((v) => !v)}
-            aria-label={menuOpen ? "Fermer le menu" : "Ouvrir le menu"}
+            aria-label={menuOpen ? t("closeMenu") : t("openMenu")}
             aria-expanded={menuOpen}
             aria-controls="mobile-menu"
             className="md:hidden relative -mr-2 inline-flex h-11 w-11 items-center justify-center text-white"
@@ -152,7 +159,7 @@ export function Nav() {
       {menuOpen && (
         <button
           type="button"
-          aria-label="Fermer le menu"
+          aria-label={t("closeMenu")}
           onClick={() => setMenuOpen(false)}
           className="md:hidden fixed inset-x-0 bottom-0 top-16 bg-black/40 cursor-default"
         />
@@ -180,7 +187,7 @@ export function Nav() {
                     active ? "text-white" : "text-ink-mute hover:text-white"
                   }`}
                 >
-                  {item.label}
+                  {t(item.key)}
                 </Link>
               );
             })}
@@ -190,18 +197,23 @@ export function Nav() {
                 href={item.href}
                 className="border-b border-border/60 py-3 text-[15px] text-ink-mute transition-colors hover:text-white"
               >
-                {item.label}
+                {t(item.key)}
               </Link>
             ))}
             <Link
               href="/connexion"
               aria-current={isActive("/connexion") ? "page" : undefined}
-              className={`py-3 text-[15px] transition-colors ${
+              className={`border-b border-border/60 py-3 text-[15px] transition-colors ${
                 isActive("/connexion") ? "text-white" : "text-ink-mute hover:text-white"
               }`}
             >
-              Connexion
+              {t("login")}
             </Link>
+
+            {/* Sélecteur de langue (mobile) */}
+            <div className="py-4">
+              <LanguageSwitcher variant="inline" />
+            </div>
           </div>
         </div>
       </div>

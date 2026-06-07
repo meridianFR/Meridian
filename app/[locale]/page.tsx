@@ -1,4 +1,5 @@
-import Link from "next/link";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 import { STRATEGIES } from "@/lib/strategies";
 import { AmbientOrbs } from "@/components/ambient-orbs";
 import { HeroChart } from "@/components/hero-chart";
@@ -19,78 +20,86 @@ export const metadata = {
   alternates: { canonical: "/" },
 };
 
-const MARQUEE = [
-  "Stratégies documentées",
-  "Calculateur de position",
-  "Calculateur de risque",
-  "Journal de trading",
-  "Checklist pré-trade",
-  "Formation méthodique",
-];
-
+// Piliers : visuel + lien fixes, libellés tirés des traductions.
 const PILLARS = [
   {
-    eyebrow: "01 — Stratégies",
-    title: "Méthodes structurées",
-    desc: "Des configurations génériques, documentées, sans promesses. Lisibles, testables, adaptables.",
-    cta: "Explorer",
+    eyebrow: "pillarStrategiesEyebrow",
+    title: "pillarStrategiesTitle",
+    desc: "pillarStrategiesDesc",
+    cta: "pillarStrategiesCta",
     href: "/strategies",
     Visual: StrategyVisual,
   },
   {
-    eyebrow: "02 — Outils",
-    title: "Calculateur & Journal",
-    desc: "Un calculateur de position et un journal de trading. Calculer avant. Mesurer après.",
-    cta: "Voir les outils",
+    eyebrow: "pillarToolsEyebrow",
+    title: "pillarToolsTitle",
+    desc: "pillarToolsDesc",
+    cta: "pillarToolsCta",
     href: "/outils",
     Visual: ToolsVisual,
   },
   {
-    eyebrow: "03 — Formation",
-    title: "Apprendre proprement",
-    desc: "Une pédagogie sans hype. Comprendre ce qu'on trade, mesurer ce qu'on fait.",
-    cta: "Découvrir",
+    eyebrow: "pillarFormationEyebrow",
+    title: "pillarFormationTitle",
+    desc: "pillarFormationDesc",
+    cta: "pillarFormationCta",
     href: "/formation",
     Visual: FormationVisual,
   },
-];
+] as const;
 
 const TOOLS = [
   {
-    tag: "Stratégie",
-    title: "Des setups que tu peux mesurer",
-    desc: "Entrée, stop, objectif : chaque configuration est documentée, générique et testable. Tu sais pourquoi tu entres — et où tu sors.",
+    tag: "toolStrategyTag",
+    title: "toolStrategyTitle",
+    desc: "toolStrategyDesc",
+    cta: "toolStrategyCta",
     href: "/strategies",
-    cta: "Voir les stratégies",
     Visual: StrategyShowcase,
   },
   {
-    tag: "Calculatrice",
-    title: "La taille de position, sans erreur",
-    desc: "Capital, risque, stop : la calculatrice te donne le lot exact à trader. Tu calibres ton risque avant d'appuyer sur le bouton.",
+    tag: "toolCalculatorTag",
+    title: "toolCalculatorTitle",
+    desc: "toolCalculatorDesc",
+    cta: "toolCalculatorCta",
     href: "/outils",
-    cta: "Ouvrir la calculatrice",
     Visual: CalculatorShowcase,
   },
   {
-    tag: "Journal",
-    title: "Mesure ce que tu fais vraiment",
-    desc: "Chaque trade enregistré, ta courbe d'équité, tes statistiques. Le journal transforme ton historique en décisions.",
+    tag: "toolJournalTag",
+    title: "toolJournalTitle",
+    desc: "toolJournalDesc",
+    cta: "toolJournalCta",
     href: "/journal",
-    cta: "Découvrir le journal",
     Visual: JournalShowcase,
   },
   {
-    tag: "Formations",
-    title: "Apprendre proprement, étape par étape",
-    desc: "Des modules progressifs, sans hype : comprendre ce que tu trades avant de risquer un euro. Une pédagogie de discipline.",
+    tag: "toolFormationTag",
+    title: "toolFormationTitle",
+    desc: "toolFormationDesc",
+    cta: "toolFormationCta",
     href: "/formation",
-    cta: "Suivre les formations",
     Visual: FormationShowcase,
   },
-];
+] as const;
 
-export default function Home() {
+export default async function Home({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations("Home");
+
+  // Balises de mise en forme partagées par les titres « rich text ».
+  const titleTags = {
+    br: () => <br />,
+    em: (chunks: React.ReactNode) => <span className="shimmer">{chunks}</span>,
+  };
+
+  const marquee = t.raw("marquee") as string[];
+
   return (
     <main className="relative min-h-screen">
       <section className="relative pt-32 md:pt-44 pb-32 md:pb-44 overflow-hidden">
@@ -107,26 +116,23 @@ export default function Home() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
             <div className="lg:col-span-7">
               <div className="mono text-[10px] uppercase tracking-[0.4em] text-ink-faint mb-10 fade-in">
-                ° Meridian — 2026
+                {t("heroEyebrow")}
               </div>
 
               <h1 className="h-title text-[44px] sm:text-[64px] md:text-[80px] lg:text-[92px] fade-in-up">
-                Trade ce que
-                <br />
-                tu <span className="shimmer">mesures.</span>
+                {t.rich("heroTitle", titleTags)}
               </h1>
 
               <p className="text-ink-mute text-base md:text-lg max-w-xl mt-10 leading-relaxed fade-in-up-2">
-                Outils et stratégies pour traders sérieux. Pas de signaux. Pas de promesses.
-                Une méthode.
+                {t("heroLead")}
               </p>
 
               <div className="flex flex-wrap gap-3 mt-12 fade-in-up-3">
                 <Link href="/strategies" className="btn btn-primary">
-                  Explorer les stratégies
+                  {t("heroCtaPrimary")}
                 </Link>
                 <Link href="/outils" className="btn btn-ghost">
-                  Voir les outils
+                  {t("heroCtaSecondary")}
                 </Link>
               </div>
             </div>
@@ -137,9 +143,9 @@ export default function Home() {
               </div>
               <div className="grid grid-cols-3 gap-px mt-3 bg-border rounded-xl overflow-hidden border border-border hairline-top">
                 {[
-                  { k: "Outils", v: "2" },
-                  { k: "Stratégies", v: String(STRATEGIES.length) },
-                  { k: "Marché", v: "FR" },
+                  { k: t("statTools"), v: "2" },
+                  { k: t("statStrategies"), v: String(STRATEGIES.length) },
+                  { k: t("statMarket"), v: t("statMarketValue") },
                 ].map((s) => (
                   <div key={s.k} className="bg-black px-4 py-3">
                     <div className="mono text-[9px] uppercase tracking-[0.3em] text-ink-faint">
@@ -157,7 +163,7 @@ export default function Home() {
       <section aria-hidden className="relative border-y border-border overflow-hidden py-5 bg-white/[0.012]">
         <div className="marquee-mask overflow-hidden">
           <div className="flex w-max animate-marquee">
-            {[...MARQUEE, ...MARQUEE].map((item, i) => (
+            {[...marquee, ...marquee].map((item, i) => (
               <div key={i} className="flex items-center">
                 <span className="mono text-[11px] uppercase tracking-[0.25em] text-ink-faint whitespace-nowrap">
                   {item}
@@ -175,17 +181,14 @@ export default function Home() {
             <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-14">
               <div>
                 <div className="mono text-[10px] uppercase tracking-[0.4em] text-ink-faint mb-5">
-                  ° Trois piliers
+                  {t("pillarsEyebrow")}
                 </div>
                 <h2 className="h-title text-4xl md:text-5xl max-w-2xl">
-                  Trois axes,
-                  <br />
-                  <span className="shimmer">une méthode.</span>
+                  {t.rich("pillarsTitle", titleTags)}
                 </h2>
               </div>
               <p className="text-ink-mute max-w-sm text-sm leading-relaxed">
-                Mesurer, structurer, comprendre. Chaque pilier vit indépendamment, mais
-                s'assemble dans une approche cohérente.
+                {t("pillarsLead")}
               </p>
             </div>
           </Reveal>
@@ -200,19 +203,19 @@ export default function Home() {
                     className="pillar-card bg-black p-10 md:p-12 block group hover:bg-[#070707] h-full"
                   >
                     <div className="mono text-[10px] uppercase tracking-[0.35em] text-ink-faint mb-8">
-                      {p.eyebrow}
+                      {t(p.eyebrow)}
                     </div>
                     <div className="mb-8 opacity-80 group-hover:opacity-100 transition-opacity">
                       <Visual />
                     </div>
                     <div className="text-2xl md:text-[26px] font-semibold tracking-tight mb-3">
-                      {p.title}
+                      {t(p.title)}
                     </div>
                     <p className="text-ink-mute text-sm leading-relaxed mb-8 max-w-xs">
-                      {p.desc}
+                      {t(p.desc)}
                     </p>
                     <span className="text-[13px] text-white/70 group-hover:text-white transition-colors inline-flex items-center gap-1.5">
-                      {p.cta}
+                      {t(p.cta)}
                       <span className="transition-transform group-hover:translate-x-0.5">→</span>
                     </span>
                   </Link>
@@ -235,30 +238,36 @@ export default function Home() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
             <Reveal as="div" className="lg:col-span-4">
               <div className="mono text-[10px] uppercase tracking-[0.4em] text-ink-faint mb-5">
-                ° Approche
+                {t("approachEyebrow")}
               </div>
               <h2 className="h-title text-4xl md:text-5xl">
-                Pas de hype.
-                <br />
-                <span className="shimmer">Une discipline.</span>
+                {t.rich("approachTitle", titleTags)}
               </h2>
             </Reveal>
 
             <Reveal as="div" className="lg:col-span-8" delay={120}>
               <p className="text-2xl md:text-[28px] leading-relaxed tracking-tight font-light text-ink">
-                Meridian n'est pas un service de signaux ni une école de gourous.
-                <span className="text-ink-muted">
-                  {" "}
-                  Ce sont des outils et des stratégies génériques, pensés pour mesurer,
-                  discipliner et durer — au-delà du prochain cycle.
-                </span>
+                {t("approachBodyLead")}
+                <span className="text-ink-muted">{t("approachBodyRest")}</span>
               </p>
 
               <div className="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-px bg-border rounded-2xl overflow-hidden border border-border">
                 {[
-                  { k: "Approche", v: "Méthodique", d: "Pas d'improvisation." },
-                  { k: "Posture", v: "Générique", d: "Pas de signaux." },
-                  { k: "Horizon", v: "Long terme", d: "Pas de promesse." },
+                  {
+                    k: t("approachCard1Key"),
+                    v: t("approachCard1Value"),
+                    d: t("approachCard1Desc"),
+                  },
+                  {
+                    k: t("approachCard2Key"),
+                    v: t("approachCard2Value"),
+                    d: t("approachCard2Desc"),
+                  },
+                  {
+                    k: t("approachCard3Key"),
+                    v: t("approachCard3Value"),
+                    d: t("approachCard3Desc"),
+                  },
                 ].map((c) => (
                   <div key={c.k} className="bg-black p-6">
                     <div className="mono text-[10px] uppercase tracking-[0.3em] text-ink-faint mb-3">
@@ -287,44 +296,41 @@ export default function Home() {
             <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-14 md:mb-16">
               <div>
                 <div className="mono text-[10px] uppercase tracking-[0.4em] text-ink-faint mb-5">
-                  ° L'écosystème
+                  {t("ecosystemEyebrow")}
                 </div>
                 <h2 className="h-title text-4xl md:text-5xl max-w-2xl">
-                  Tout ce que Meridian
-                  <br />
-                  <span className="shimmer">met entre tes mains.</span>
+                  {t.rich("ecosystemTitle", titleTags)}
                 </h2>
               </div>
               <p className="text-ink-mute max-w-sm text-sm leading-relaxed">
-                Quatre briques, une seule logique : calculer avant, mesurer après,
-                et progresser sur des bases mesurables.
+                {t("ecosystemLead")}
               </p>
             </div>
           </Reveal>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 lg:gap-6">
-            {TOOLS.map((t, i) => {
-              const Visual = t.Visual;
+            {TOOLS.map((tool, i) => {
+              const Visual = tool.Visual;
               return (
-                <Reveal key={t.tag} delay={i * 100}>
+                <Reveal key={tool.href} delay={i * 100}>
                   <Link
-                    href={t.href}
+                    href={tool.href}
                     className="card pillar-card rounded-2xl p-6 md:p-8 block group h-full"
                   >
                     <div className="glow-border rounded-xl bg-black/40 p-5 md:p-6 mb-7 overflow-hidden">
                       <Visual />
                     </div>
                     <div className="mono text-[10px] uppercase tracking-[0.35em] text-ink-faint mb-4">
-                      {t.tag}
+                      {t(tool.tag)}
                     </div>
                     <h3 className="text-xl md:text-2xl font-semibold tracking-tight mb-3">
-                      {t.title}
+                      {t(tool.title)}
                     </h3>
                     <p className="text-ink-mute text-sm leading-relaxed mb-6 max-w-md">
-                      {t.desc}
+                      {t(tool.desc)}
                     </p>
                     <span className="text-[13px] text-white/70 group-hover:text-white transition-colors inline-flex items-center gap-1.5">
-                      {t.cta}
+                      {t(tool.cta)}
                       <span className="transition-transform group-hover:translate-x-0.5">
                         →
                       </span>

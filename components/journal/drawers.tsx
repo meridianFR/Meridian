@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Card, Collapsible, Drawer, FieldLabel, FlagPill, Rval, SegGroup } from "@/app/journal-preview/ui";
+import { Card, Collapsible, Drawer, FieldLabel, FlagPill, Rval, SegGroup } from "@/app/[locale]/journal-preview/ui";
 import { TAG_OPTIONS, tradeDate, tradeDuration, tradeTime, type Direction, type Flag, type Trade, type TradeInput } from "@/lib/journal/types";
 import { parseTradesCsv, type ImportDraft, type ImportResult } from "@/lib/journal/csv";
 import { computeStats } from "@/lib/journal/analytics";

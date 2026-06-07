@@ -1,34 +1,40 @@
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 
-const COLUMNS: { title: string; links: { href: string; label: string }[] }[] = [
+const COLUMNS: {
+  titleKey: string;
+  links: { href: string; key: string }[];
+}[] = [
   {
-    title: "Produit",
+    titleKey: "colProduct",
     links: [
-      { href: "/strategies", label: "Stratégies" },
-      { href: "/outils", label: "Outils" },
-      { href: "/journal", label: "Journal" },
-      { href: "/formation", label: "Formation" },
+      { href: "/strategies", key: "strategies" },
+      { href: "/outils", key: "tools" },
+      { href: "/journal", key: "journal" },
+      { href: "/formation", key: "formation" },
     ],
   },
   {
-    title: "Marque",
+    titleKey: "colBrand",
     links: [
-      { href: "/faq", label: "FAQ" },
-      { href: "/a-propos", label: "À propos" },
-      { href: "/ecosysteme", label: "Écosystème" },
+      { href: "/faq", key: "faq" },
+      { href: "/a-propos", key: "about" },
+      { href: "/ecosysteme", key: "ecosystem" },
     ],
   },
   {
-    title: "Légal",
+    titleKey: "colLegal",
     links: [
-      { href: "/mentions-legales", label: "Mentions légales" },
-      { href: "/cgv", label: "CGV" },
-      { href: "/disclaimer-financier", label: "Disclaimer" },
+      { href: "/mentions-legales", key: "legalNotice" },
+      { href: "/cgv", key: "terms" },
+      { href: "/disclaimer-financier", key: "disclaimer" },
     ],
   },
 ];
 
 export function Footer() {
+  const t = useTranslations("Footer");
+
   return (
     <footer className="relative mt-40 border-t border-border bg-black z-10 overflow-hidden">
       {/* liseré lumineux sur l'arête supérieure */}
@@ -55,18 +61,18 @@ export function Footer() {
               </span>
             </Link>
             <p className="text-ink-mute text-sm mt-4 max-w-xs leading-relaxed">
-              Outils et stratégies pour traders qui veulent durer, pas exploser.
+              {t("tagline")}
             </p>
             <p className="mono text-[10px] uppercase tracking-[0.3em] text-ink-faint mt-7">
-              ° Outils &amp; stratégies · v0.1
+              {t("badge")}
             </p>
           </div>
 
           <div className="md:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-8">
             {COLUMNS.map((col) => (
-              <div key={col.title}>
+              <div key={col.titleKey}>
                 <div className="mono text-[10px] uppercase tracking-[0.3em] text-ink-faint mb-5">
-                  {col.title}
+                  {t(col.titleKey)}
                 </div>
                 <ul className="space-y-3">
                   {col.links.map((l) => (
@@ -75,7 +81,7 @@ export function Footer() {
                         href={l.href}
                         className="link-underline inline-block py-1 text-sm text-ink-mute"
                       >
-                        {l.label}
+                        {t(l.key)}
                       </Link>
                     </li>
                   ))}
@@ -95,16 +101,14 @@ export function Footer() {
 
         <div className="pt-8 border-t border-border">
           <p className="mono text-[10px] uppercase tracking-[0.15em] text-ink-faint leading-relaxed max-w-3xl">
-            Meridian ne fournit aucun conseil en investissement. Contenu pédagogique uniquement.
-            Le trading comporte un risque de perte en capital. Les performances passées ne préjugent
-            pas des performances futures.
+            {t("disclaimerText")}
           </p>
         </div>
 
         <div className="mt-6 flex flex-wrap justify-between gap-4 mono text-[10px] uppercase tracking-[0.15em] text-ink-faint">
-          <span>© 2026 Meridian °</span>
+          <span>{t("copyright")}</span>
           <Link href="/legal" className="link-underline">
-            Mentions · CGV · Disclaimer
+            {t("legalLinks")}
           </Link>
         </div>
       </div>

@@ -1,0 +1,219 @@
+{
+  "Language": {
+    "label": "Idioma",
+    "fr": "Français",
+    "en": "English",
+    "pt": "Português",
+    "switchTo": "Mudar para {language}"
+  },
+  "Nav": {
+    "strategies": "Estratégias",
+    "tools": "Ferramentas",
+    "journal": "Journal",
+    "faq": "FAQ",
+    "formation": "Formações",
+    "about": "Sobre",
+    "login": "Entrar",
+    "cta": "Nossas formações",
+    "openMenu": "Abrir menu",
+    "closeMenu": "Fechar menu"
+  },
+  "Footer": {
+    "tagline": "Ferramentas e estratégias para traders que querem durar, não estourar.",
+    "badge": "° Ferramentas & estratégias · v0.1",
+    "colProduct": "Produto",
+    "colBrand": "Marca",
+    "colLegal": "Jurídico",
+    "strategies": "Estratégias",
+    "tools": "Ferramentas",
+    "journal": "Journal",
+    "formation": "Formações",
+    "faq": "FAQ",
+    "about": "Sobre",
+    "ecosystem": "Ecossistema",
+    "legalNotice": "Avisos legais",
+    "terms": "Termos",
+    "disclaimer": "Disclaimer",
+    "disclaimerText": "A Meridian não fornece qualquer aconselhamento de investimento. Conteúdo educativo apenas. O trading envolve risco de perda de capital. O desempenho passado não garante resultados futuros.",
+    "copyright": "© 2026 Meridian °",
+    "legalLinks": "Avisos · Termos · Disclaimer"
+  },
+  "Home": {
+    "marquee": [
+      "Estratégias documentadas",
+      "Calculadora de posição",
+      "Calculadora de risco",
+      "Diário de trading",
+      "Checklist pré-trade",
+      "Formação metódica"
+    ],
+    "heroEyebrow": "° Meridian — 2026",
+    "heroTitle": "Opere o que<br></br>você <em>mede.</em>",
+    "heroLead": "Ferramentas e estratégias para traders sérios. Sem sinais. Sem promessas. Um método.",
+    "heroCtaPrimary": "Explorar as estratégias",
+    "heroCtaSecondary": "Ver as ferramentas",
+    "statTools": "Ferramentas",
+    "statStrategies": "Estratégias",
+    "statMarket": "Mercado",
+    "statMarketValue": "FR",
+    "pillarsEyebrow": "° Três pilares",
+    "pillarsTitle": "Três eixos,<br></br><em>um método.</em>",
+    "pillarsLead": "Medir, estruturar, entender. Cada pilar funciona por si só, mas se encaixa em uma abordagem coerente.",
+    "pillarStrategiesEyebrow": "01 — Estratégias",
+    "pillarStrategiesTitle": "Métodos estruturados",
+    "pillarStrategiesDesc": "Configurações genéricas e documentadas, sem promessas. Legíveis, testáveis, adaptáveis.",
+    "pillarStrategiesCta": "Explorar",
+    "pillarToolsEyebrow": "02 — Ferramentas",
+    "pillarToolsTitle": "Calculadora & Journal",
+    "pillarToolsDesc": "Uma calculadora de posição e um diário de trading. Calcule antes. Meça depois.",
+    "pillarToolsCta": "Ver as ferramentas",
+    "pillarFormationEyebrow": "03 — Formação",
+    "pillarFormationTitle": "Aprender do jeito certo",
+    "pillarFormationDesc": "Uma pedagogia sem hype. Entender o que você opera, medir o que você faz.",
+    "pillarFormationCta": "Conhecer",
+    "approachEyebrow": "° Abordagem",
+    "approachTitle": "Sem hype.<br></br><em>Uma disciplina.</em>",
+    "approachBodyLead": "A Meridian não é um serviço de sinais nem uma escola de gurus.",
+    "approachBodyRest": " São ferramentas e estratégias genéricas, pensadas para medir, disciplinar e durar — além do próximo ciclo.",
+    "approachCard1Key": "Abordagem",
+    "approachCard1Value": "Metódica",
+    "approachCard1Desc": "Sem improviso.",
+    "approachCard2Key": "Postura",
+    "approachCard2Value": "Genérica",
+    "approachCard2Desc": "Sem sinais.",
+    "approachCard3Key": "Horizonte",
+    "approachCard3Value": "Longo prazo",
+    "approachCard3Desc": "Sem promessas.",
+    "ecosystemEyebrow": "° O ecossistema",
+    "ecosystemTitle": "Tudo o que a Meridian<br></br><em>coloca nas suas mãos.</em>",
+    "ecosystemLead": "Quatro blocos, uma só lógica: calcular antes, medir depois e evoluir sobre bases mensuráveis.",
+    "toolStrategyTag": "Estratégia",
+    "toolStrategyTitle": "Setups que você pode medir",
+    "toolStrategyDesc": "Entrada, stop, alvo: cada configuração é documentada, genérica e testável. Você sabe por que entra — e onde sai.",
+    "toolStrategyCta": "Ver as estratégias",
+    "toolCalculatorTag": "Calculadora",
+    "toolCalculatorTitle": "O tamanho da posição, sem erro",
+    "toolCalculatorDesc": "Capital, risco, stop: a calculadora te dá o lote exato para operar. Você calibra o risco antes de apertar o botão.",
+    "toolCalculatorCta": "Abrir a calculadora",
+    "toolJournalTag": "Journal",
+    "toolJournalTitle": "Meça o que você realmente faz",
+    "toolJournalDesc": "Cada trade registrado, sua curva de capital, suas estatísticas. O journal transforma seu histórico em decisões.",
+    "toolJournalCta": "Conhecer o journal",
+    "toolFormationTag": "Formações",
+    "toolFormationTitle": "Aprender do jeito certo, passo a passo",
+    "toolFormationDesc": "Módulos progressivos, sem hype: entender o que você opera antes de arriscar um centavo. Uma pedagogia de disciplina.",
+    "toolFormationCta": "Fazer as formações"
+  },
+  "Placeholder": {
+    "statusDraft": "EM CURSO",
+    "statusSoon": "EM BREVE",
+    "statusLive": "LIVE",
+    "underConstruction": "Página em construção",
+    "roadmapNote": "O conteúdo será publicado conforme o roadmap da Meridian.",
+    "back": "Voltar"
+  },
+  "Ecosystem": {
+    "sectionLabel": "Visão · Ecossistema",
+    "title": "Um ecossistema.",
+    "shimmer": "Uma camada de dados.",
+    "subtitle": "A calculadora e o diário são os dois blocos de um único sistema. Calcular antes do trade. Medir depois."
+  },
+  "About": {
+    "sectionLabel": "Sobre · Meridian °",
+    "title": "Quem.",
+    "shimmer": "Por quê.",
+    "subtitle": "Bio curta, abordagem, posições públicas. Sem growth bro. Sem fundador te dizendo quanto ganha."
+  },
+  "Manifesto": {
+    "sectionLabel": "Manifesto · Meridian °",
+    "title": "Operar não é um jogo.",
+    "shimmer": "É uma disciplina.",
+    "subtitle": "Por que a Meridian existe. Quem está por trás. A auditoria pessoal de 1.400 trades. O texto completo chega aqui."
+  },
+  "ToolChecklist": {
+    "sectionLabel": "Ferramenta · Free",
+    "shimmer": "Checklist.",
+    "subtitle": "Dez perguntas para fazer antes de cada entrada. Formato interativo, salvamento local, exportação em PDF para impressão.",
+    "backLabel": "Todas as ferramentas"
+  },
+  "ToolJournal": {
+    "sectionLabel": "Ferramenta · Pago · Carro-chefe",
+    "shimmer": "Journal.",
+    "subtitle": "O sistema operacional do trader sério. Diário automatizado, edge medido, Weekly Behavioral Report todo domingo.",
+    "backLabel": "Todas as ferramentas"
+  },
+  "ToolAudit": {
+    "sectionLabel": "Ferramenta · Free · Lead gen",
+    "shimmer": "Audit.",
+    "subtitle": "Faça upload do seu histórico. A ferramenta identifica suas horas lucrativas, seus padrões de erro, sua variância. Auditoria única gratuita.",
+    "backLabel": "Todas as ferramentas"
+  },
+  "Faq": {
+    "metaTitle": "FAQ",
+    "metaDescription": "Perguntas frequentes sobre a Meridian, suas ferramentas e estratégias.",
+    "eyebrow": "° FAQ",
+    "titleLine1": "Perguntas",
+    "titleEmph": "frequentes.",
+    "lead": "As perguntas que mais aparecem. Respostas curtas, sem rodeios.",
+    "contactPrefix": "Uma pergunta que não está na lista? ",
+    "contactLink": "Consulte primeiro o enquadramento legal →",
+    "items": [
+      {
+        "q": "A Meridian dá sinais de trading?",
+        "a": "Não. Nenhum sinal, nenhum alerta, nenhuma recomendação de compra ou venda. A Meridian oferece ferramentas metodológicas e estratégias genéricas para estruturar a sua abordagem."
+      },
+      {
+        "q": "Isto é aconselhamento de investimento?",
+        "a": "Não. A Meridian não é um consultor de investimentos financeiros. Todo o conteúdo é educativo e permanece no âmbito da recomendação geral (posição AMF DOC-2008-23)."
+      },
+      {
+        "q": "Para quem é a Meridian?",
+        "a": "Para traders que já passaram da fase de 'aprender a apertar os botões' e querem estruturar uma abordagem duradoura: diário, gestão de risco, método, auditoria."
+      },
+      {
+        "q": "Quais mercados são cobertos?",
+        "a": "As ferramentas e estratégias da Meridian são genéricas. Aplicam-se à maioria dos mercados líquidos: forex, índices, ações, futuros, cripto. Os exemplos são propositalmente neutros."
+      },
+      {
+        "q": "O que é gratuito e o que é pago?",
+        "a": "As estratégias documentadas e algumas ferramentas básicas são gratuitas. As ferramentas premium (diário completo, auditoria avançada, módulos de formação) serão pagas à medida que forem publicadas."
+      },
+      {
+        "q": "Existe um Discord, uma comunidade?",
+        "a": "Por enquanto não. A Meridian é um conjunto de ferramentas e conteúdos, não uma comunidade. O objetivo é a autonomia, não a dependência de um grupo."
+      },
+      {
+        "q": "Posso esperar resultados garantidos?",
+        "a": "Não. Nenhuma ferramenta, método ou estratégia garante resultados. O trading envolve risco de perda de capital. Consulte o disclaimer financeiro."
+      }
+    ]
+  },
+  "Formation": {
+    "metaTitle": "Formação",
+    "metaDescription": "Módulos de formação Meridian — entender, medir e estruturar a sua abordagem de trading.",
+    "eyebrow": "° Formação",
+    "titleLine1": "Aprender",
+    "titleEmph": "do jeito certo.",
+    "lead": "Uma pedagogia sem hype. Sem promessa de ganhos, sem receita mágica. Os blocos que permitem entender o que você opera e medir o que você faz.",
+    "soon": "Em breve",
+    "footerPrefix": "A formação Meridian está em construção. ",
+    "footerLink": "Enquanto isso, explore as estratégias →",
+    "modules": [
+      {
+        "eyebrow": "Módulo 01",
+        "title": "Fundamentos",
+        "desc": "Leitura de mercado, estrutura, contexto. Construir uma grade de análise."
+      },
+      {
+        "eyebrow": "Módulo 02",
+        "title": "Risco & tamanho de posição",
+        "desc": "Sizing, stop, drawdown. O que separa o trader que dura."
+      },
+      {
+        "eyebrow": "Módulo 03",
+        "title": "Diário & auditoria",
+        "desc": "Medir o que você faz. Identificar seu edge. Corrigir seus vieses."
+      }
+    ]
+  }
+}

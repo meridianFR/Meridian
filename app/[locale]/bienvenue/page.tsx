@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { AmbientOrbs } from "@/components/ambient-orbs";
 import { LockIcon } from "@/components/journal-logos";
-import { LoginForm } from "@/app/connexion/login-form";
+import { LoginForm } from "@/app/[locale]/connexion/login-form";
 import { SetPasswordForm } from "./set-password-form";
 import { getStripe, provisionAccountFromSession } from "@/lib/stripe";
 import { isStripeConfigured } from "@/lib/env";

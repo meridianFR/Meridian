@@ -1,4 +1,5 @@
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 
 type PlaceholderProps = {
   sectionNum?: string;
@@ -11,10 +12,13 @@ type PlaceholderProps = {
   backLabel?: string;
 };
 
-const STATUS_LABEL: Record<NonNullable<PlaceholderProps["status"]>, string> = {
-  draft: "EN COURS",
-  soon: "À VENIR",
-  live: "LIVE",
+const STATUS_KEY: Record<
+  NonNullable<PlaceholderProps["status"]>,
+  "statusDraft" | "statusSoon" | "statusLive"
+> = {
+  draft: "statusDraft",
+  soon: "statusSoon",
+  live: "statusLive",
 };
 
 export function Placeholder({
@@ -27,6 +31,7 @@ export function Placeholder({
   backHref,
   backLabel,
 }: PlaceholderProps) {
+  const t = useTranslations("Placeholder");
   return (
     <main className="relative pt-32 pb-24 overflow-hidden radial-glow">
       <div
@@ -65,11 +70,11 @@ export function Placeholder({
 
         <div className="glow-border rounded-2xl p-7 max-w-2xl">
           <div className="flex items-center gap-3 mb-4">
-            <span className="pill pill-white">{STATUS_LABEL[status]}</span>
-            <span className="h-eyebrow">Page en construction</span>
+            <span className="pill pill-white">{t(STATUS_KEY[status])}</span>
+            <span className="h-eyebrow">{t("underConstruction")}</span>
           </div>
           <p className="text-ink-mute text-sm leading-relaxed">
-            Le contenu sera publié selon la roadmap Meridian.
+            {t("roadmapNote")}
           </p>
         </div>
 
@@ -79,7 +84,7 @@ export function Placeholder({
               href={backHref}
               className="font-mono text-[11px] uppercase tracking-widest text-ink-mute hover:text-white transition-colors"
             >
-              ← {backLabel ?? "Retour"}
+              ← {backLabel ?? t("back")}
             </Link>
           </div>
         )}

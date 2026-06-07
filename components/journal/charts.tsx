@@ -1,6 +1,6 @@
 "use client";
 
-import { Rval } from "@/app/journal-preview/ui";
+import { Rval } from "@/app/[locale]/journal-preview/ui";
 import type { HourPerf, ScatterPoint } from "@/lib/journal/analytics";
 
 /**

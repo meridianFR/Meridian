@@ -1,4 +1,9 @@
+import createNextIntlPlugin from "next-intl/plugin";
+
 /** @type {import('next').NextConfig} */
+
+// Branche le multilingue (next-intl). Pointe vers la config serveur i18n.
+const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 
 // En-têtes de sécurité appliqués à toutes les routes.
 // CSP volontairement laissée de côté ici (étape ultérieure : nonce/middleware).
@@ -69,4 +74,4 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+export default withNextIntl(nextConfig);

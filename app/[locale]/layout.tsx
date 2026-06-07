@@ -1,8 +1,12 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { NextIntlClientProvider, hasLocale } from "next-intl";
+import { getMessages, setRequestLocale } from "next-intl/server";
+import { routing } from "@/i18n/routing";
 import { inter, jetbrainsMono } from "@/lib/fonts";
 import { CursorGlow } from "@/components/cursor-glow";
 import { SiteChrome } from "@/components/site-chrome";
-import "./globals.css";
+import "../globals.css";
 
 export const metadata: Metadata = {
   title: {
@@ -50,14 +54,31 @@ const jsonLd = {
   ],
 };
 
-export default function RootLayout({
+// Pré-rend les trois langues à la compilation (rendu statique).
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }));
+}
+
+export default async function LocaleLayout({
   children,
+  params,
 }: {
   children: React.ReactNode;
+  params: Promise<{ locale: string }>;
 }) {
+  const { locale } = await params;
+  // Langue inconnue → 404 (sécurité de routage).
+  if (!hasLocale(routing.locales, locale)) {
+    notFound();
+  }
+  // Active le rendu statique pour cette langue.
+  setRequestLocale(locale);
+
+  const messages = await getMessages();
+
   return (
     <html
-      lang="fr"
+      lang={locale}
       className={`${inter.variable} ${jetbrainsMono.variable}`}
     >
       <body>
@@ -65,8 +86,10 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        <CursorGlow />
-        <SiteChrome>{children}</SiteChrome>
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          <CursorGlow />
+          <SiteChrome>{children}</SiteChrome>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

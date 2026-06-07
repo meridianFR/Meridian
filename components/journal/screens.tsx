@@ -13,7 +13,7 @@ import {
   StatusPill,
   StreakDots,
   WinLossBar,
-} from "@/app/journal-preview/ui";
+} from "@/app/[locale]/journal-preview/ui";
 import { Heatmap, HeatmapLegend, HoursBars, EmotionScatter } from "./charts";
 import {
   TAG_OPTIONS,

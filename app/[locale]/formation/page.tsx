@@ -1,51 +1,55 @@
-import Link from "next/link";
+import type { Metadata } from "next";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 
-export const metadata = {
-  title: "Formation",
-  alternates: { canonical: "/formation" },
-  description:
-    "Modules de formation Meridian — comprendre, mesurer, structurer son approche de trading.",
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "Formation" });
+  return {
+    title: t("metaTitle"),
+    description: t("metaDescription"),
+    alternates: {
+      canonical: locale === "fr" ? "/formation" : `/${locale}/formation`,
+      languages: { fr: "/formation", en: "/en/formation", pt: "/pt/formation" },
+    },
+  };
+}
 
-const MODULES = [
-  {
-    eyebrow: "Module 01",
-    title: "Fondamentaux",
-    desc: "Lecture de marché, structure, contexte. Construire une grille d'analyse.",
-  },
-  {
-    eyebrow: "Module 02",
-    title: "Risque & taille de position",
-    desc: "Sizing, stop, drawdown. Ce qui sépare le trader qui dure.",
-  },
-  {
-    eyebrow: "Module 03",
-    title: "Journal & audit",
-    desc: "Mesurer ce qu'on fait. Identifier son edge. Corriger ses biais.",
-  },
-];
+type Module = { eyebrow: string; title: string; desc: string };
 
-export default function Page() {
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations("Formation");
+  const modules = t.raw("modules") as Module[];
+
   return (
     <main className="relative pt-40 pb-32">
       <div className="max-w-wrap mx-auto px-6 sm:px-10">
         <div className="mono text-[10px] uppercase tracking-[0.4em] text-ink-faint mb-10">
-          ° Formation
+          {t("eyebrow")}
         </div>
 
         <h1 className="h-title text-5xl md:text-7xl max-w-3xl mb-8">
-          Apprendre
+          {t("titleLine1")}
           <br />
-          <span className="shimmer">proprement.</span>
+          <span className="shimmer">{t("titleEmph")}</span>
         </h1>
 
         <p className="text-ink-mute text-lg max-w-2xl leading-relaxed mb-20">
-          Une pédagogie sans hype. Pas de promesse de revenus, pas de recette magique.
-          Les briques qui permettent de comprendre ce qu'on trade et de mesurer ce qu'on fait.
+          {t("lead")}
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-border border border-border rounded-2xl overflow-hidden">
-          {MODULES.map((m) => (
+          {modules.map((m) => (
             <div key={m.title} className="bg-black p-8 md:p-10">
               <div className="mono text-[10px] uppercase tracking-[0.35em] text-ink-faint mb-5">
                 {m.eyebrow}
@@ -53,7 +57,7 @@ export default function Page() {
               <div className="text-xl font-semibold tracking-tight mb-3">{m.title}</div>
               <p className="text-ink-mute text-sm leading-relaxed mb-6">{m.desc}</p>
               <span className="mono text-[10px] uppercase tracking-[0.25em] text-ink-faint">
-                Bientôt
+                {t("soon")}
               </span>
             </div>
           ))}
@@ -61,12 +65,12 @@ export default function Page() {
 
         <div className="mt-20 max-w-2xl">
           <p className="text-ink-mute text-sm leading-relaxed">
-            La formation Meridian est en construction.{" "}
+            {t("footerPrefix")}
             <Link
               href="/strategies"
               className="text-white underline-offset-4 underline decoration-ink-faint hover:decoration-white"
             >
-              En attendant, explore les stratégies →
+              {t("footerLink")}
             </Link>
           </p>
         </div>
