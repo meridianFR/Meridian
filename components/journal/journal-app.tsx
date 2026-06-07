@@ -186,7 +186,7 @@ export function JournalApp({
     setNewAccountMode(false);
     setNewAccountName("");
     setAccountMenu(false);
-    router.push(`/app?account=${res.data.id}`);
+    router.push(`/app/journal?account=${res.data.id}`);
   }
 
   const editFromDetail = (t: Trade) => {
@@ -225,7 +225,7 @@ export function JournalApp({
                         key={a.id}
                         onClick={() => {
                           setAccountMenu(false);
-                          if (a.id !== currentAccountId) router.push(`/app?account=${a.id}`);
+                          if (a.id !== currentAccountId) router.push(`/app/journal?account=${a.id}`);
                         }}
                         className={`w-full text-left px-3 py-2 rounded-lg text-sm transition ${a.id === currentAccountId ? "text-white bg-white/5" : "text-ink-mute hover:bg-white/5 hover:text-white"}`}
                       >

@@ -23,7 +23,7 @@ export function FirstAccount({ email }: { email: string }) {
       setError(res.error);
       return;
     }
-    router.push(`/app?account=${res.data.id}`);
+    router.push(`/app/journal?account=${res.data.id}`);
     router.refresh();
   }
 
