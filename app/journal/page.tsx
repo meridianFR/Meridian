@@ -525,14 +525,6 @@ const INCLUS = [
   "Support email",
 ];
 
-const ROADMAP = [
-  "API broker directe",
-  "Comparaison cohorte anonymisée",
-  "Tags personnalisés",
-  "Application mobile",
-  "Crypto",
-];
-
 const PLATFORMS = [
   { mark: <MetaTraderLogo variant="4" />, status: "Import CSV · prêt", tone: "edge" as const },
   { mark: <MetaTraderLogo variant="5" />, status: "Import CSV · prêt", tone: "edge" as const },
@@ -558,7 +550,7 @@ const PLANS = [
     price: "190 €",
     period: "/ an",
     sub: "Soit 15,83 €/mois.",
-    perks: ["Tout le mensuel", "Deux mois offerts (−17 %)", "Pack PDF stratégies inclus"],
+    perks: ["Tout le mensuel", "Deux mois offerts (−17 %)"],
     cta: "Prendre l'annuel",
     primary: true,
     badge: "Deux mois offerts",
@@ -1083,7 +1075,7 @@ export default function JournalMarketing() {
           </div>
 
           <Reveal delay={120}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-border rounded-2xl overflow-hidden border border-border mt-px">
+            <div className="bg-border rounded-2xl overflow-hidden border border-border mt-px">
               <div className="bg-black p-8 md:p-10">
                 <div className="mono text-[10px] uppercase tracking-[0.3em] text-ink-faint mb-6">
                   Inclus dans les deux formules
@@ -1096,21 +1088,6 @@ export default function JournalMarketing() {
                     </li>
                   ))}
                 </ul>
-              </div>
-              <div className="bg-black p-8 md:p-10">
-                <div className="mono text-[10px] uppercase tracking-[0.3em] text-ink-faint mb-6">Pas encore — roadmap</div>
-                <ul className="space-y-3">
-                  {ROADMAP.map((f) => (
-                    <li key={f} className="flex items-start gap-3 text-sm text-ink-mute">
-                      <span className="text-ink-faint mono mt-0.5 shrink-0">·</span>
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <p className="text-ink-faint text-xs leading-relaxed mt-6 max-w-xs">
-                  On construit avec les retours des premiers abonnés. Pas de date promise, pas de
-                  fonctionnalité fantôme.
-                </p>
               </div>
             </div>
           </Reveal>

@@ -36,10 +36,42 @@ export async function POST(request: Request) {
     return NextResponse.redirect(new URL("/abonnement", SITE_URL), 303);
   }
 
+  // « flow=cancel » : ouvre directement le parcours de résiliation Stripe.
+  const form = await request.formData().catch(() => null);
+  const wantsCancel = form?.get("flow") === "cancel";
+
+  const stripe = getStripe();
+  const customer = sub.stripe_customer_id;
+  const returnUrl = `${SITE_URL}/app/journal`;
+
   try {
-    const portal = await getStripe().billingPortal.sessions.create({
-      customer: sub.stripe_customer_id,
-      return_url: `${SITE_URL}/app`,
+    // Lien direct vers la résiliation si demandé et si un abonnement existe.
+    if (wantsCancel) {
+      const subs = await stripe.subscriptions.list({ customer, status: "all", limit: 1 });
+      const subId = subs.data[0]?.id;
+      if (subId) {
+        try {
+          const portal = await stripe.billingPortal.sessions.create({
+            customer,
+            return_url: returnUrl,
+            flow_data: {
+              type: "subscription_cancel",
+              subscription_cancel: { subscription: subId },
+            },
+          });
+          return NextResponse.redirect(portal.url, 303);
+        } catch (e) {
+          // Le parcours « cancel » n'est peut-être pas activé dans la config du
+          // portail : on retombe sur le portail générique (résiliation possible
+          // s'il est activé), plutôt que d'échouer.
+          console.error("[billing-portal] flow cancel indisponible, repli portail générique", e);
+        }
+      }
+    }
+
+    const portal = await stripe.billingPortal.sessions.create({
+      customer,
+      return_url: returnUrl,
     });
     return NextResponse.redirect(portal.url, 303);
   } catch (e) {

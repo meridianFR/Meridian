@@ -16,7 +16,8 @@ import {
   updateTradeAction,
 } from "@/lib/journal/actions";
 
-type Tab = "performance" | "aujourdhui" | "trades" | "comportement" | "revue";
+type Tab = "performance" | "aujourdhui" | "trades" | "comportement" | "revue" | "parametres";
+// Onglets numérotés du flux de trading (Paramètres est à part, aligné à droite).
 const TABS: { id: Tab; label: string }[] = [
   { id: "performance", label: "Performance" },
   { id: "aujourdhui", label: "Aujourd'hui" },
@@ -44,6 +45,10 @@ export function JournalApp({
   initialSetups,
   reviewedWeeks: initialReviewed,
   userEmail,
+  journalActive,
+  planName,
+  periodEnd,
+  cancelAtPeriodEnd,
 }: {
   accounts: Account[];
   currentAccountId: string;
@@ -51,6 +56,10 @@ export function JournalApp({
   initialSetups: string[];
   reviewedWeeks: string[];
   userEmail: string;
+  journalActive: boolean;
+  planName: string | null;
+  periodEnd: string | null;
+  cancelAtPeriodEnd: boolean;
 }) {
   const router = useRouter();
   const [trades, setTrades] = useState<Trade[]>(() => sortTrades(initialTrades));
@@ -299,6 +308,13 @@ export function JournalApp({
                 {tab === t.id && <span className="absolute bottom-0 left-0 right-0 h-px bg-white" />}
               </button>
             ))}
+            <button
+              onClick={() => setTab("parametres")}
+              className={`mono text-[11px] uppercase tracking-[0.2em] h-full relative transition whitespace-nowrap sm:ml-auto ${tab === "parametres" ? "text-white" : "text-ink-faint hover:text-ink-mute"}`}
+            >
+              Paramètres
+              {tab === "parametres" && <span className="absolute bottom-0 left-0 right-0 h-px bg-white" />}
+            </button>
           </div>
         </div>
       </header>
@@ -311,6 +327,15 @@ export function JournalApp({
         {tab === "trades" && <Trades trades={trades} setups={setupNames} onOpen={setDetailTrade} tagFilter={tagFilter} onClearTagFilter={() => setTagFilter(null)} />}
         {tab === "comportement" && <Comportement trades={trades} onVoirTrades={voirTrades} />}
         {tab === "revue" && <Revue trades={trades} reviewedWeeks={reviewedWeeks} onStart={() => setRevueOpen(true)} onOpenReport={setReport} />}
+        {tab === "parametres" && (
+          <Parametres
+            email={userEmail}
+            journalActive={journalActive}
+            planName={planName}
+            periodEnd={periodEnd}
+            cancelAtPeriodEnd={cancelAtPeriodEnd}
+          />
+        )}
       </main>
 
       {/* Drawers */}
@@ -325,6 +350,102 @@ export function JournalApp({
           {toast}
         </div>
       )}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------- Paramètres */
+
+function Parametres({
+  email,
+  journalActive,
+  planName,
+  periodEnd,
+  cancelAtPeriodEnd,
+}: {
+  email: string;
+  journalActive: boolean;
+  planName: string | null;
+  periodEnd: string | null;
+  cancelAtPeriodEnd: boolean;
+}) {
+  return (
+    <div className="max-w-2xl">
+      <span className="mono text-[10px] uppercase tracking-[0.4em] text-ink-faint">Paramètres</span>
+      <h1 className="h-title text-[28px] sm:text-[34px] mt-3 text-white">Ton compte</h1>
+
+      {/* Compte */}
+      <section className="mt-10">
+        <span className="h-eyebrow">Compte</span>
+        <div className="mt-4 rounded-2xl border border-border bg-black overflow-hidden">
+          <div className="flex items-center justify-between px-6 py-5">
+            <span className="text-[13px] text-ink-mute">Adresse email</span>
+            <span className="text-[14px] text-white truncate ml-4">{email}</span>
+          </div>
+        </div>
+      </section>
+
+      {/* Abonnement */}
+      <section className="mt-10">
+        <span className="h-eyebrow">Abonnement</span>
+        <div className="mt-4 rounded-2xl border border-border bg-black overflow-hidden">
+          {journalActive ? (
+            <>
+              <div className="flex items-center justify-between px-6 py-5 border-b border-border">
+                <span className="text-[13px] text-ink-mute">Formule</span>
+                <span className="flex items-center gap-2.5 ml-4">
+                  <span className="pill pill-green">ACTIF</span>
+                  <span className="text-[14px] text-white">{planName ? `Meridian Journal — ${planName}` : "Meridian Journal"}</span>
+                </span>
+              </div>
+              {periodEnd && (
+                <div className="flex items-center justify-between px-6 py-5 border-b border-border">
+                  <span className="text-[13px] text-ink-mute">
+                    {cancelAtPeriodEnd ? "Se termine le" : "Prochain renouvellement"}
+                  </span>
+                  <span className="text-[14px] text-white ml-4">{periodEnd}</span>
+                </div>
+              )}
+              <div className="px-6 py-5 flex flex-col sm:flex-row gap-3">
+                <form method="post" action="/api/billing-portal">
+                  <button type="submit" className="btn btn-ghost !py-2 !px-4 text-[13px] w-full sm:w-auto justify-center">
+                    Gérer l&apos;abonnement
+                  </button>
+                </form>
+                {!cancelAtPeriodEnd && (
+                  <form method="post" action="/api/billing-portal">
+                    <input type="hidden" name="flow" value="cancel" />
+                    <button
+                      type="submit"
+                      className="btn btn-ghost !py-2 !px-4 text-[13px] w-full sm:w-auto justify-center !text-risk hover:!border-risk/50"
+                    >
+                      Résilier mon abonnement
+                    </button>
+                  </form>
+                )}
+              </div>
+              {cancelAtPeriodEnd && (
+                <p className="px-6 pb-5 -mt-1 text-[12px] text-ink-faint leading-relaxed">
+                  Ta résiliation est enregistrée. Tu gardes l&apos;accès jusqu&apos;à la fin de la période en cours.
+                </p>
+              )}
+            </>
+          ) : (
+            <div className="px-6 py-6">
+              <p className="text-[14px] text-ink-mute leading-relaxed">
+                Tu n&apos;as pas d&apos;abonnement actif au Journal.
+              </p>
+              <a href="/abonnement" className="btn btn-primary !py-2 !px-4 text-[13px] mt-4 inline-flex">
+                S&apos;abonner — 19 € / mois
+                <span aria-hidden className="ml-1.5 text-black/50">→</span>
+              </a>
+            </div>
+          )}
+        </div>
+        <p className="mt-4 text-[12px] text-ink-faint leading-relaxed">
+          La gestion du paiement, des factures et la résiliation se font via le portail sécurisé Stripe.
+        </p>
+      </section>
     </div>
   );
 }
