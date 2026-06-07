@@ -133,7 +133,7 @@ export async function createAccountAction(name: unknown): Promise<ActionResult<A
       { onConflict: "user_id,name", ignoreDuplicates: true },
     );
 
-  revalidatePath("/app");
+  revalidatePath("/app/journal");
   return { ok: true, data: { id: data.id, name: data.name, createdAt: data.created_at } };
 }
 
@@ -149,7 +149,7 @@ export async function createTradeAction(accountId: unknown, input: unknown): Pro
 
   const { data, error } = await ctx.supabase.from("trades").insert(rowFrom(clean, ctx.user.id, accId)).select("*").single();
   if (error) return { ok: false, error: error.message };
-  revalidatePath("/app");
+  revalidatePath("/app/journal");
   return { ok: true, data: mapTrade(data) };
 }
 
@@ -171,7 +171,7 @@ export async function updateTradeAction(tradeId: unknown, input: unknown): Promi
     .select("*")
     .single();
   if (error) return { ok: false, error: error.message };
-  revalidatePath("/app");
+  revalidatePath("/app/journal");
   return { ok: true, data: mapTrade(data) };
 }
 
@@ -181,7 +181,7 @@ export async function deleteTradeAction(tradeId: unknown): Promise<ActionResult<
   const id = String(tradeId ?? "");
   const { error } = await ctx.supabase.from("trades").delete().eq("id", id).eq("user_id", ctx.user.id);
   if (error) return { ok: false, error: error.message };
-  revalidatePath("/app");
+  revalidatePath("/app/journal");
   return { ok: true, data: { id } };
 }
 
@@ -200,7 +200,7 @@ export async function importTradesAction(accountId: unknown, drafts: unknown): P
 
   const { data, error } = await ctx.supabase.from("trades").insert(rows).select("*");
   if (error) return { ok: false, error: error.message };
-  revalidatePath("/app");
+  revalidatePath("/app/journal");
   const trades = (data ?? []).map(mapTrade);
   return { ok: true, data: { count: trades.length, trades } };
 }
@@ -217,7 +217,7 @@ export async function createSetupAction(name: unknown): Promise<ActionResult<{ n
     .from("setups")
     .upsert({ user_id: ctx.user.id, name: clean }, { onConflict: "user_id,name", ignoreDuplicates: true });
   if (error) return { ok: false, error: error.message };
-  revalidatePath("/app");
+  revalidatePath("/app/journal");
   return { ok: true, data: { name: clean } };
 }
 
@@ -251,6 +251,6 @@ export async function saveWeeklyReviewAction(
     { onConflict: "user_id,account_id,week_start" },
   );
   if (error) return { ok: false, error: error.message };
-  revalidatePath("/app");
+  revalidatePath("/app/journal");
   return { ok: true, data: { weekStart: wk } };
 }

@@ -91,6 +91,19 @@ export function Nav() {
             })}
           </div>
 
+          {/* Connexion — espace client (desktop) */}
+          <Link
+            href="/connexion"
+            aria-current={isActive("/connexion") ? "page" : undefined}
+            className={`hidden md:inline-flex px-3.5 py-1.5 rounded-full transition-colors duration-300 ${
+              isActive("/connexion")
+                ? "text-white bg-white/[0.06]"
+                : "text-ink-mute hover:text-white hover:bg-white/[0.04]"
+            }`}
+          >
+            Connexion
+          </Link>
+
           {/* CTA principal — toujours visible */}
           <Link
             href="/formation"
@@ -171,17 +184,24 @@ export function Nav() {
                 </Link>
               );
             })}
-            {MOBILE_SECONDARY.map((item, i) => (
+            {MOBILE_SECONDARY.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`py-3 text-[15px] text-ink-mute transition-colors hover:text-white ${
-                  i < MOBILE_SECONDARY.length - 1 ? "border-b border-border/60" : ""
-                }`}
+                className="border-b border-border/60 py-3 text-[15px] text-ink-mute transition-colors hover:text-white"
               >
                 {item.label}
               </Link>
             ))}
+            <Link
+              href="/connexion"
+              aria-current={isActive("/connexion") ? "page" : undefined}
+              className={`py-3 text-[15px] transition-colors ${
+                isActive("/connexion") ? "text-white" : "text-ink-mute hover:text-white"
+              }`}
+            >
+              Connexion
+            </Link>
           </div>
         </div>
       </div>

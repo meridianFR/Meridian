@@ -1,21 +1,20 @@
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
-import { getSubscription, isActive } from "@/lib/subscription";
 import { isSupabaseConfigured } from "@/lib/env";
-import { syncSubscriptionForCustomer } from "@/lib/stripe";
 
 export const metadata: Metadata = {
-  title: "Espace abonné",
+  title: "Espace client",
   robots: { index: false, follow: false },
 };
 
 export const dynamic = "force-dynamic";
 
 /**
- * Barrière d'accès — défense en profondeur (en plus du middleware).
- * « Fail closed » : toute incertitude ⇒ redirection. La chrome de l'app
- * (header, comptes, onglets) est portée par le JournalApp / l'onboarding.
+ * Barrière d'accès à l'espace client — défense en profondeur (en plus du
+ * middleware). Ici on exige seulement d'être connecté : le tableau de bord est
+ * accessible à tout compte. Le verrou d'abonnement vit sur /app/journal.
+ * « Fail closed » : toute incertitude ⇒ redirection.
  */
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   if (!isSupabaseConfigured()) {
@@ -28,30 +27,6 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   } = await supabase.auth.getUser();
   if (!user) {
     redirect("/connexion?next=/app");
-  }
-
-  let sub = await getSubscription(supabase, user.id);
-
-  // Filet post-paiement : réconciliation si le webhook n'a pas encore convergé.
-  if (!isActive(sub)) {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("stripe_customer_id")
-      .eq("id", user.id)
-      .maybeSingle();
-    const customerId = profile?.stripe_customer_id as string | undefined;
-    if (customerId) {
-      try {
-        await syncSubscriptionForCustomer(customerId);
-        sub = await getSubscription(supabase, user.id);
-      } catch {
-        // Stripe indisponible : on reste « fail closed ».
-      }
-    }
-  }
-
-  if (!isActive(sub)) {
-    redirect("/abonnement");
   }
 
   return <>{children}</>;
