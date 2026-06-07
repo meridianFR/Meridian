@@ -1,11 +1,52 @@
-import Link from "next/link";
+import type { Metadata } from "next";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 
-export const metadata = {
-  title: "Mentions légales",
-  description: "Mentions légales du site Meridian °.",
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "LegalNotice" });
+  return {
+    title: t("metaTitle"),
+    description: t("metaDescription"),
+    alternates: {
+      canonical: locale === "fr" ? "/mentions-legales" : `/${locale}/mentions-legales`,
+      languages: {
+        fr: "/mentions-legales",
+        en: "/en/mentions-legales",
+        pt: "/pt/mentions-legales",
+      },
+    },
+  };
+}
 
-export default function Page() {
+const SECTIONS = ["s1", "s2", "s3", "s4", "s5", "s6"] as const;
+
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations("LegalNotice");
+
+  const richTags = {
+    vercel: (chunks: React.ReactNode) => (
+      <a
+        href="https://vercel.com"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-white underline-offset-4 underline decoration-ink-faint hover:decoration-white"
+      >
+        {chunks}
+      </a>
+    ),
+  };
+
   return (
     <main className="relative pt-40 pb-32">
       <div className="max-w-3xl mx-auto px-6 sm:px-10">
@@ -13,81 +54,23 @@ export default function Page() {
           href="/legal"
           className="mono text-[10px] uppercase tracking-[0.3em] text-ink-faint hover:text-white transition-colors"
         >
-          ← Légal
+          ← {t("back")}
         </Link>
 
         <h1 className="h-title text-5xl md:text-6xl mt-8 mb-6">
-          Mentions <span className="shimmer">légales.</span>
+          {t("title")}
+          <span className="shimmer">{t("titleEmph")}</span>
         </h1>
 
-        <p className="text-ink-mute text-base leading-relaxed mb-16">
-          Dernière mise à jour : 2026
-        </p>
+        <p className="text-ink-mute text-base leading-relaxed mb-16">{t("updated")}</p>
 
         <div className="space-y-12 text-ink leading-relaxed">
-          <section>
-            <h2 className="text-xl font-semibold tracking-tight mb-4">Éditeur du site</h2>
-            <p className="text-ink-mute">
-              Meridian ° — informations d'éditeur à compléter (raison sociale, forme juridique,
-              capital, RCS, siège social, numéro de TVA intracommunautaire, directeur de
-              publication).
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-xl font-semibold tracking-tight mb-4">Hébergement</h2>
-            <p className="text-ink-mute">
-              Site hébergé par Vercel Inc., 340 S Lemon Ave #4133, Walnut, CA 91789, USA —{" "}
-              <a
-                href="https://vercel.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-white underline-offset-4 underline decoration-ink-faint hover:decoration-white"
-              >
-                vercel.com
-              </a>
-              .
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-xl font-semibold tracking-tight mb-4">
-              Propriété intellectuelle
-            </h2>
-            <p className="text-ink-mute">
-              L'ensemble du site — design, code, textes, illustrations, vidéos, marques,
-              logo, nomenclature « Meridian », noms d'outils et de stratégies — est protégé
-              par le droit d'auteur et le droit des marques. Toute reproduction, représentation
-              ou exploitation, totale ou partielle, sans autorisation écrite préalable est
-              interdite.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-xl font-semibold tracking-tight mb-4">Données personnelles</h2>
-            <p className="text-ink-mute">
-              Conformément au RGPD et à la loi Informatique et Libertés, vous disposez
-              d'un droit d'accès, de rectification, d'effacement et de portabilité de vos
-              données. Pour toute demande, contactez l'éditeur via l'adresse indiquée
-              ci-dessus.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-xl font-semibold tracking-tight mb-4">Cookies</h2>
-            <p className="text-ink-mute">
-              Le site utilise des cookies strictement nécessaires à son fonctionnement et,
-              le cas échéant, des cookies de mesure d'audience anonymisés. Aucun cookie
-              publicitaire tiers n'est déposé.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-xl font-semibold tracking-tight mb-4">Contact</h2>
-            <p className="text-ink-mute">
-              Pour toute question relative au site : meridianFR@hotmail.com
-            </p>
-          </section>
+          {SECTIONS.map((s) => (
+            <section key={s}>
+              <h2 className="text-xl font-semibold tracking-tight mb-4">{t(`${s}h`)}</h2>
+              <p className="text-ink-mute">{t.rich(`${s}p`, richTags)}</p>
+            </section>
+          ))}
         </div>
       </div>
     </main>
