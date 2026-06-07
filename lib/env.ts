@@ -49,7 +49,7 @@ export const PLANS: Record<
     price: "190 €",
     period: "/ an",
     sub: "Soit 15,83 €/mois — deux mois offerts.",
-    perks: ["Tout le mensuel", "Deux mois offerts (−17 %)", "Pack PDF stratégies inclus"],
+    perks: ["Tout le mensuel", "Deux mois offerts (−17 %)"],
   },
 };
 
