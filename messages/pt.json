@@ -370,5 +370,62 @@
     "spLoading": "Criando…",
     "errSetFailed": "Não foi possível definir a senha. Tente novamente em instantes.",
     "errSetSignin": "Senha salva. Faça login na página de acesso."
+  },
+  "Plans": {
+    "monthly": {
+      "name": "Mensal",
+      "period": "/ mês",
+      "sub": "Sem compromisso.",
+      "perks": ["Todo o Journal, sem limites", "Weekly Report todo domingo", "Até 3 contas"]
+    },
+    "annual": {
+      "name": "Anual",
+      "period": "/ ano",
+      "sub": "Ou seja, 15,83 €/mês — dois meses grátis.",
+      "perks": ["Tudo do mensal", "Dois meses grátis (−17%)"]
+    }
+  },
+  "Subscribe": {
+    "metaTitle": "Finalizar a sua assinatura",
+    "eyebrow": "° Meridian Journal",
+    "heading": "Finalizar a sua assinatura",
+    "canceled": "Pagamento cancelado — nada foi cobrado.",
+    "errConfig": "O pagamento ainda não está ativo. Tente novamente mais tarde.",
+    "errStripe": "Ocorreu um erro no pagamento. Tente novamente.",
+    "offerLabel": "Plano {name}",
+    "twoMonthsFree": "Dois meses grátis",
+    "pay": "Pagar {price} {period}",
+    "switchTo": "Mudar para o plano {name}",
+    "securePayment": "Pagamento seguro via Stripe",
+    "noCommitment": "Sem compromisso · cancele em um clique."
+  },
+  "Tools": {
+    "metaTitle": "Ferramentas Meridian — Suite de trading",
+    "metaDescription": "Calculadora de posição, checklist pré-trade, auditoria de 100 trades, diário de trading. Quatro ferramentas gratuitas, um produto principal pago. Sem anúncios, sem cadastro forçado.",
+    "eyebrow": "00 / 02 · Catálogo de ferramentas",
+    "title1": "As ferramentas.",
+    "title2": "Grátis e pagas.",
+    "intro": "Uma ferramenta gratuita para calcular antes do trade. Um produto principal pago para medir depois. Nenhuma ferramenta foi feita para você operar mais — cada uma foi feita para você operar melhor.",
+    "freeSection": "Grátis · sem cadastro",
+    "paidSection": "Pago · produto principal",
+    "oneTool": "1 ferramenta",
+    "statusLive": "LIVE",
+    "statusSoon": "EM BREVE",
+    "statusPaid": "PAGO",
+    "discover": "Descobrir",
+    "useTool": "Usar a ferramenta",
+    "learnMore": "Saber mais",
+    "ruleEyebrow": "Regra",
+    "ruleTitle1": "Grátis é o conhecimento.",
+    "ruleTitle2": "Pago é a automação.",
+    "ruleText": "As ferramentas gratuitas cobrem os cálculos e as checklists que um trader faz à mão antes de entrar em uma posição. O produto principal pago automatiza o que um trader faz à mão depois — registrar, identificar padrões, medir o edge ao longo do tempo. Nenhum recurso gratuito é limitado para forçar o upgrade.",
+    "calcName": "Calculadora Meridian",
+    "calcCategory": "Cálculo · Grátis",
+    "calcDesc": "Capital, risco, tamanho de posição, drawdown projetado sobre 15 perdas consecutivas. Sem cadastro. Sem anúncios.",
+    "calcFeatures": ["41 instrumentos", "28 pares de forex", "Multicenário", "URL compartilhável"],
+    "journalName": "Meridian Journal",
+    "journalCategory": "Produto principal · Pago",
+    "journalDesc": "Diário de trading automatizado. Importação CSV do broker, dashboard de estatísticas, Weekly Behavioral Report enviado todo domingo à noite.",
+    "journalFeatures": ["Importação MT4/MT5", "Weekly Report automático", "Estatísticas ilimitadas", "19 € / mês"]
   }
 }

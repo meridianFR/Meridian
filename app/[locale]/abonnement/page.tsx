@@ -1,27 +1,38 @@
-import Link from "next/link";
-import { redirect } from "next/navigation";
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
+import { Link, redirect } from "@/i18n/navigation";
 import { AmbientOrbs } from "@/components/ambient-orbs";
 import { LockIcon, StripeMark, VisaMark, MastercardMark } from "@/components/journal-logos";
 import { createClient } from "@/lib/supabase/server";
 import { getSubscription, isActive } from "@/lib/subscription";
 import { PLANS, isPlanId, isSupabaseConfigured, type PlanId } from "@/lib/env";
 
-export const metadata: Metadata = {
-  title: "Finaliser ton abonnement",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "Subscribe" });
+  return {
+    title: t("metaTitle"),
+    robots: { index: false, follow: false },
+  };
+}
 
 export const dynamic = "force-dynamic";
 
 export default async function AbonnementPage({
+  params,
   searchParams,
 }: {
+  params: Promise<{ locale: string }>;
   searchParams: Promise<{ plan?: string; canceled?: string; error?: string }>;
 }) {
+  const { locale } = await params;
   const sp = await searchParams;
   const plan: PlanId = isPlanId(sp.plan) ? sp.plan : "monthly";
-  const info = PLANS[plan];
+  const price = PLANS[plan].price;
   const other: PlanId = plan === "monthly" ? "annual" : "monthly";
 
   // Si l'auth n'est pas configurée, on n'essaie pas d'appeler Supabase.
@@ -31,11 +42,17 @@ export default async function AbonnementPage({
       data: { user },
     } = await supabase.auth.getUser();
     if (!user) {
-      redirect(`/connexion?next=${encodeURIComponent(`/abonnement?plan=${plan}`)}`);
+      redirect({ href: `/connexion?next=${encodeURIComponent(`/abonnement?plan=${plan}`)}`, locale });
     }
-    const sub = await getSubscription(supabase, user.id);
-    if (isActive(sub)) redirect("/app");
+    const sub = await getSubscription(supabase, user!.id);
+    if (isActive(sub)) redirect({ href: "/app", locale });
   }
+
+  const t = await getTranslations("Subscribe");
+  const tp = await getTranslations("Plans");
+  const period = tp(`${plan}.period`);
+  const sub = tp(`${plan}.sub`);
+  const perks = tp.raw(`${plan}.perks`) as string[];
 
   return (
     <main className="relative min-h-screen flex items-center justify-center px-6 py-28">
@@ -46,43 +63,43 @@ export default async function AbonnementPage({
             href="/journal#tarifs"
             className="mono text-[10px] uppercase tracking-[0.4em] text-ink-faint hover:text-ink-mute transition-colors"
           >
-            ° Meridian Journal
+            {t("eyebrow")}
           </Link>
-          <h1 className="h-title text-3xl md:text-4xl mt-5">Finaliser ton abonnement</h1>
+          <h1 className="h-title text-3xl md:text-4xl mt-5">{t("heading")}</h1>
         </div>
 
         {sp.canceled && (
           <div className="rounded-lg border border-border-2 bg-[#0a0a0a] px-4 py-3 mb-5 text-sm text-ink-mute">
-            Paiement annulé — rien ne t'a été débité.
+            {t("canceled")}
           </div>
         )}
         {sp.error === "config" && (
           <div className="rounded-lg border border-border-2 bg-[#0a0a0a] px-4 py-3 mb-5 text-sm text-ink-mute">
-            Le paiement n'est pas encore activé. Réessaie un peu plus tard.
+            {t("errConfig")}
           </div>
         )}
         {sp.error === "stripe" && (
           <div className="rounded-lg border border-risk/40 bg-[#0a0a0a] px-4 py-3 mb-5 text-sm text-risk">
-            Une erreur est survenue côté paiement. Réessaie.
+            {t("errStripe")}
           </div>
         )}
 
         <div className="rounded-2xl border border-border bg-[#070707] p-8">
           <div className="flex items-center justify-between mb-6">
             <span className="mono text-[10px] uppercase tracking-[0.3em] text-ink-faint">
-              Offre {info.name}
+              {t("offerLabel", { name: tp(`${plan}.name`) })}
             </span>
-            {plan === "annual" && <span className="pill pill-green">Deux mois offerts</span>}
+            {plan === "annual" && <span className="pill pill-green">{t("twoMonthsFree")}</span>}
           </div>
 
           <div className="flex items-baseline gap-1.5">
-            <span className="text-4xl font-bold tracking-tight">{info.price}</span>
-            <span className="text-ink-mute text-sm">{info.period}</span>
+            <span className="text-4xl font-bold tracking-tight">{price}</span>
+            <span className="text-ink-mute text-sm">{period}</span>
           </div>
-          <div className="mono text-[11px] text-ink-faint mt-2 mb-7">{info.sub}</div>
+          <div className="mono text-[11px] text-ink-faint mt-2 mb-7">{sub}</div>
 
           <ul className="space-y-3 mb-8">
-            {info.perks.map((f) => (
+            {perks.map((f) => (
               <li key={f} className="flex items-start gap-3 text-sm text-ink">
                 <span className="text-edge mono mt-0.5 shrink-0">+</span>
                 {f}
@@ -94,7 +111,7 @@ export default async function AbonnementPage({
           <form method="post" action="/api/checkout">
             <input type="hidden" name="plan" value={plan} />
             <button type="submit" className="btn btn-primary w-full justify-center">
-              Payer {info.price} {info.period}
+              {t("pay", { price, period })}
             </button>
           </form>
 
@@ -102,23 +119,21 @@ export default async function AbonnementPage({
             href={`/abonnement?plan=${other}`}
             className="mono text-[10px] uppercase tracking-[0.25em] text-ink-faint hover:text-ink-mute transition-colors block text-center mt-5"
           >
-            Passer à l'offre {PLANS[other].name.toLowerCase()}
+            {t("switchTo", { name: tp(`${other}.name`).toLowerCase() })}
           </Link>
         </div>
 
         <div className="flex flex-col items-center gap-4 mt-8">
           <div className="inline-flex items-center gap-2 text-ink-mute">
             <LockIcon className="text-edge" />
-            <span className="text-[13px]">Paiement sécurisé via Stripe</span>
+            <span className="text-[13px]">{t("securePayment")}</span>
           </div>
           <div className="flex items-center gap-4">
             <VisaMark />
             <MastercardMark />
             <StripeMark />
           </div>
-          <p className="text-ink-mute text-xs text-center">
-            Sans engagement · résiliable en un clic.
-          </p>
+          <p className="text-ink-mute text-xs text-center">{t("noCommitment")}</p>
         </div>
       </div>
     </main>

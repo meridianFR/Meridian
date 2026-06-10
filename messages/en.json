@@ -370,5 +370,62 @@
     "spLoading": "Creating…",
     "errSetFailed": "Could not set the password. Try again in a moment.",
     "errSetSignin": "Password saved. Sign in from the login page."
+  },
+  "Plans": {
+    "monthly": {
+      "name": "Monthly",
+      "period": "/ month",
+      "sub": "No commitment.",
+      "perks": ["The full Journal, no limits", "Weekly Report every Sunday", "Up to 3 accounts"]
+    },
+    "annual": {
+      "name": "Annual",
+      "period": "/ year",
+      "sub": "That's €15.83/month — two months free.",
+      "perks": ["Everything in monthly", "Two months free (−17%)"]
+    }
+  },
+  "Subscribe": {
+    "metaTitle": "Complete your subscription",
+    "eyebrow": "° Meridian Journal",
+    "heading": "Complete your subscription",
+    "canceled": "Payment canceled — you were not charged.",
+    "errConfig": "Payment is not active yet. Please try again later.",
+    "errStripe": "Something went wrong on the payment side. Try again.",
+    "offerLabel": "{name} plan",
+    "twoMonthsFree": "Two months free",
+    "pay": "Pay {price} {period}",
+    "switchTo": "Switch to the {name} plan",
+    "securePayment": "Secure payment via Stripe",
+    "noCommitment": "No commitment · cancel in one click."
+  },
+  "Tools": {
+    "metaTitle": "Meridian tools — Trading suite",
+    "metaDescription": "Position calculator, pre-trade checklist, 100-trade audit, trading journal. Four free tools, one flagship paid product. No ads, no forced sign-up.",
+    "eyebrow": "00 / 02 · Tools catalogue",
+    "title1": "The tools.",
+    "title2": "Free and paid.",
+    "intro": "A free tool to calculate before the trade. A flagship paid product to measure after. No tool is built to make you trade more — each one is built to make you trade better.",
+    "freeSection": "Free · no sign-up",
+    "paidSection": "Paid · flagship product",
+    "oneTool": "1 tool",
+    "statusLive": "LIVE",
+    "statusSoon": "SOON",
+    "statusPaid": "PAID",
+    "discover": "Discover",
+    "useTool": "Use the tool",
+    "learnMore": "Learn more",
+    "ruleEyebrow": "Rule",
+    "ruleTitle1": "Free is the knowledge.",
+    "ruleTitle2": "Paid is the automation.",
+    "ruleText": "The free tools cover the calculations and checklists a trader does by hand before entering a position. The flagship paid product automates what a trader does by hand after — journaling, spotting patterns, measuring edge over time. No free feature is crippled to push an upgrade.",
+    "calcName": "Meridian Calculator",
+    "calcCategory": "Calculation · Free",
+    "calcDesc": "Capital, risk, position size, drawdown projected over 15 consecutive losses. No sign-up. No ads.",
+    "calcFeatures": ["41 instruments", "28 forex pairs", "Multi-scenario", "Shareable URL"],
+    "journalName": "Meridian Journal",
+    "journalCategory": "Flagship product · Paid",
+    "journalDesc": "Automated trading journal. Broker CSV import, stats dashboard, Weekly Behavioral Report sent every Sunday evening.",
+    "journalFeatures": ["MT4/MT5 import", "Auto Weekly Report", "Unlimited stats", "€19 / month"]
   }
 }

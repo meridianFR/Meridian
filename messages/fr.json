@@ -370,5 +370,62 @@
     "spLoading": "Création…",
     "errSetFailed": "Impossible de définir le mot de passe. Réessaie dans un instant.",
     "errSetSignin": "Mot de passe enregistré. Connecte-toi depuis la page de connexion."
+  },
+  "Plans": {
+    "monthly": {
+      "name": "Mensuel",
+      "period": "/ mois",
+      "sub": "Sans engagement.",
+      "perks": ["Tout le Journal, sans limite", "Weekly Report chaque dimanche", "Jusqu'à 3 comptes"]
+    },
+    "annual": {
+      "name": "Annuel",
+      "period": "/ an",
+      "sub": "Soit 15,83 €/mois — deux mois offerts.",
+      "perks": ["Tout le mensuel", "Deux mois offerts (−17 %)"]
+    }
+  },
+  "Subscribe": {
+    "metaTitle": "Finaliser ton abonnement",
+    "eyebrow": "° Meridian Journal",
+    "heading": "Finaliser ton abonnement",
+    "canceled": "Paiement annulé — rien ne t'a été débité.",
+    "errConfig": "Le paiement n'est pas encore activé. Réessaie un peu plus tard.",
+    "errStripe": "Une erreur est survenue côté paiement. Réessaie.",
+    "offerLabel": "Offre {name}",
+    "twoMonthsFree": "Deux mois offerts",
+    "pay": "Payer {price} {period}",
+    "switchTo": "Passer à l'offre {name}",
+    "securePayment": "Paiement sécurisé via Stripe",
+    "noCommitment": "Sans engagement · résiliable en un clic."
+  },
+  "Tools": {
+    "metaTitle": "Outils Meridian — Suite trading",
+    "metaDescription": "Calculateur de position, checklist pré-trade, audit 100 trades, journal de trading. Quatre outils gratuits, un produit phare payant. Sans publicité, sans inscription forcée.",
+    "eyebrow": "00 / 02 · Catalogue Outils",
+    "title1": "Les outils.",
+    "title2": "Free et payants.",
+    "intro": "Un outil gratuit pour calculer avant le trade. Un produit phare payant pour mesurer après. Aucun outil n'est conçu pour te faire trader plus — chacun est conçu pour te faire trader mieux.",
+    "freeSection": "Free · sans inscription",
+    "paidSection": "Payant · produit phare",
+    "oneTool": "1 outil",
+    "statusLive": "LIVE",
+    "statusSoon": "À VENIR",
+    "statusPaid": "PAYANT",
+    "discover": "Découvrir",
+    "useTool": "Utiliser l'outil",
+    "learnMore": "En savoir plus",
+    "ruleEyebrow": "Règle",
+    "ruleTitle1": "Free, c'est le savoir.",
+    "ruleTitle2": "Payant, c'est l'automatisation.",
+    "ruleText": "Les outils gratuits couvrent les calculs et les checklists qu'un trader fait à la main avant d'entrer dans une position. Le produit phare payant automatise ce qu'un trader fait à la main après — journaliser, identifier les patterns, mesurer l'edge sur la durée. Aucune feature gratuite n'est bridée pour pousser à l'upgrade.",
+    "calcName": "Calculateur Meridian",
+    "calcCategory": "Calcul · Free",
+    "calcDesc": "Capital, risque, taille de position, drawdown projeté sur 15 pertes consécutives. Sans inscription. Sans publicité.",
+    "calcFeatures": ["41 instruments", "28 paires forex", "Multi-scénarios", "URL partageable"],
+    "journalName": "Meridian Journal",
+    "journalCategory": "Produit phare · Payant",
+    "journalDesc": "Journal de trading automatisé. Import broker CSV, dashboard stats, Weekly Behavioral Report envoyé chaque dimanche soir.",
+    "journalFeatures": ["Import MT4/MT5", "Weekly Report auto", "Stats illimitées", "19 € / mois"]
   }
 }
