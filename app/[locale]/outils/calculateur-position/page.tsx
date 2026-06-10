@@ -1,80 +1,36 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 import { Reveal } from "@/components/reveal";
 import { Calculator } from "./Calculator";
 
-export const metadata: Metadata = {
-  alternates: { canonical: "/outils/calculateur-position" },
-  title: "Calculateur Meridian — Taille de position et risque",
-  description:
-    "Capital, risque, taille de position, drawdown projeté. Sans publicité, sans inscription, sans affiliation broker. Trois secondes avant chaque trade.",
-  openGraph: {
-    title: "Calculateur Meridian — Taille de position et risque",
-    description:
-      "Capital, risque, taille de position, drawdown projeté. Trois secondes. Sans inscription.",
-    type: "website",
-  },
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "Calc" });
+  return {
+    alternates: { canonical: "/outils/calculateur-position" },
+    title: t("metaTitle"),
+    description: t("metaDescription"),
+    openGraph: {
+      title: t("ogTitle"),
+      description: t("ogDescription"),
+      type: "website",
+    },
+  };
+}
 
-const METHOD = [
-  {
-    num: "01",
-    title: "Ce que font les autres calculateurs.",
-    body: "Ils traitent le risque comme une formule isolée. Tu remplis huit champs, tu cliques Calculer, tu obtiens un chiffre déconnecté du reste. Le drawdown n'apparaît jamais. La pip value est cachée. La page se charge avec trois bannières publicitaires et un lien d'affiliation broker.",
-  },
-  {
-    num: "02",
-    title: "Ce que fait le Calculateur Meridian.",
-    body: "Il traite le risque comme un système. Risque, taille de position, R-multiple, drawdown projeté sur quinze pertes consécutives — un seul écran. Sans bouton Calculer : chaque valeur que tu changes met à jour le résultat instantanément.",
-  },
-  {
-    num: "03",
-    title: "Ce que tu ne trouveras pas.",
-    body: "Pas de publicité. Pas d'affiliation broker. Pas d'inscription forcée. Pas de capture email agressive. Pas de signal d'achat ou de vente. Pas de promesse de gain. Aucun montant en euros associé à une stratégie nommée.",
-  },
-  {
-    num: "04",
-    title: "Ce que tu trouveras à la place.",
-    body: "Un instrument que tu utilises trois secondes avant chaque trade. Une mémoire locale de tes préférences. Une URL partageable qui encode tout ton calcul. Une méthode liée au framework de gestion du risque, gratuit, sans email demandé.",
-  },
-];
+type Method = { num: string; title: string; body: string };
+type Faq = { q: string; a: string };
 
-const FAQ = [
-  {
-    q: "Pourquoi pas de bouton « Calculer » ?",
-    a: "Le calcul est instantané. Chaque valeur que tu changes met à jour le résultat sans clic. Le bouton Calculer est un héritage des formulaires bancaires des années 2010. Tu n'en as pas besoin.",
-  },
-  {
-    q: "Comment Meridian connaît la pip value de mon instrument ?",
-    a: "L'outil utilise les spécifications standard de chaque instrument (taille de contrat, pip size) combinées au prix d'entrée que tu saisis. Pour convertir vers la devise de ton compte, des taux indicatifs sont appliqués — ils peuvent être affinés en mode avancé dans une prochaine version.",
-  },
-  {
-    q: "Pourquoi 1 % comme valeur par défaut ?",
-    a: "1 % est une référence pédagogique répandue, pas une vérité. La bonne valeur dépend de ton edge mesuré, de ton drawdown tolérable et de ton horizon. Le framework Gestion du risque détaille pourquoi 1 % est arbitraire.",
-  },
-  {
-    q: "Que veut dire « drawdown projeté » ?",
-    a: "C'est la perte cumulée si tu enchaînes N pertes consécutives à ton risque actuel. À 1 % par trade, dix pertes consécutives effacent 9,56 % du capital. La maths est géométrique, pas linéaire. Aucun calculateur classique ne l'affiche.",
-  },
-  {
-    q: "Mes données sont-elles stockées quelque part ?",
-    a: "Capital, devise et instruments favoris sont stockés dans le navigateur local (localStorage). Rien n'est envoyé à un serveur Meridian. Tu peux tout effacer en vidant le stockage du site.",
-  },
-  {
-    q: "Pourquoi Meridian n'affiche pas mon broker ?",
-    a: "Meridian ne fait aucune affiliation broker. Les calculateurs qui en font perdent leur neutralité : le résultat est subtilement orienté pour t'inciter à ouvrir un compte. Ici, le résultat est juste le calcul.",
-  },
-  {
-    q: "Et si je veux logger mes trades ?",
-    a: "Meridian Journal arrive plus tard cette année. Cet outil est l'avant-poste : ce que tu calcules avant le trade, le Journal le mesure après.",
-  },
-  {
-    q: "L'outil fonctionne-t-il sur mobile ?",
-    a: "Oui. Conçu mobile-first : les inputs ont une hauteur tactile confortable, les chiffres restent lisibles sans zoom, et le clavier numérique se déclenche automatiquement sur les champs de prix.",
-  },
-];
+export default async function Page() {
+  const t = await getTranslations("Calc");
+  const method = t.raw("method") as Method[];
+  const faq = t.raw("faq") as Faq[];
 
-export default function Page() {
   return (
     <main className="relative">
       <div className="radial-glow absolute inset-x-0 top-0 h-[600px] pointer-events-none" />
@@ -86,26 +42,25 @@ export default function Page() {
               href="/outils"
               className="mono text-[11px] uppercase tracking-[0.3em] text-ink-faint hover:text-white transition-colors inline-flex items-center gap-2"
             >
-              <span>←</span> Tous les outils
+              <span>←</span> {t("backToTools")}
             </Link>
           </Reveal>
 
           <div className="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-end">
             <div className="lg:col-span-8">
               <Reveal delay={80}>
-                <span className="h-eyebrow">01 / 02 · Outil · Free</span>
+                <span className="h-eyebrow">{t("heroEyebrow")}</span>
               </Reveal>
               <Reveal delay={140}>
                 <h1 className="h-title text-[44px] sm:text-[56px] lg:text-[72px] mt-4 text-white">
-                  Calculateur Meridian.
+                  {t("heroTitle1")}
                   <br />
-                  <span className="shimmer">Avant d&apos;entrer.</span>
+                  <span className="shimmer">{t("heroTitle2")}</span>
                 </h1>
               </Reveal>
               <Reveal delay={220}>
                 <p className="mt-6 max-w-xl text-[16px] lg:text-[17px] text-ink-mute leading-relaxed">
-                  Capital, risque, taille de position, drawdown projeté.
-                  Trois secondes. Sans inscription, sans publicité, sans affiliation broker.
+                  {t("heroIntro")}
                 </p>
               </Reveal>
             </div>
@@ -113,9 +68,9 @@ export default function Page() {
             <div className="lg:col-span-4">
               <Reveal delay={300}>
                 <div className="grid grid-cols-3 gap-px bg-border rounded-xl overflow-hidden">
-                  <Kpi label="Instruments" value="23" />
-                  <Kpi label="Devises" value="4" />
-                  <Kpi label="Inscription" value="—" />
+                  <Kpi label={t("kpiInstruments")} value="23" />
+                  <Kpi label={t("kpiCurrencies")} value="4" />
+                  <Kpi label={t("kpiSignup")} value="—" />
                 </div>
               </Reveal>
             </div>
@@ -123,7 +78,7 @@ export default function Page() {
         </div>
       </section>
 
-      <section className="relative" aria-label="Calculateur">
+      <section className="relative" aria-label={t("metaTitle")}>
         <div className="max-w-wrap mx-auto px-6 sm:px-10 pb-20">
           <Reveal>
             <Calculator />
@@ -136,23 +91,22 @@ export default function Page() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
             <div className="lg:col-span-4">
               <Reveal>
-                <span className="h-eyebrow">Méthode</span>
+                <span className="h-eyebrow">{t("methodEyebrow")}</span>
               </Reveal>
               <Reveal delay={80}>
                 <h2 className="h-title text-[32px] lg:text-[44px] mt-4 text-white">
-                  Pourquoi cet outil <span className="shimmer">est différent.</span>
+                  {t("methodTitle1")}<span className="shimmer">{t("methodTitle2")}</span>
                 </h2>
               </Reveal>
               <Reveal delay={160}>
                 <p className="mt-5 text-[15px] text-ink-mute leading-relaxed">
-                  Cinq points qui séparent un calculateur jetable d&apos;un instrument
-                  que tu utilises à chaque trade.
+                  {t("methodIntro")}
                 </p>
               </Reveal>
             </div>
 
             <div className="lg:col-span-8 space-y-3">
-              {METHOD.map((m, i) => (
+              {method.map((m, i) => (
                 <Reveal key={m.num} delay={i * 80}>
                   <article className="card rounded-2xl p-6 lg:p-7">
                     <div className="flex items-start gap-6">
@@ -181,22 +135,22 @@ export default function Page() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
             <div className="lg:col-span-4">
               <Reveal>
-                <span className="h-eyebrow">Questions</span>
+                <span className="h-eyebrow">{t("faqEyebrow")}</span>
               </Reveal>
               <Reveal delay={80}>
                 <h2 className="h-title text-[32px] lg:text-[44px] mt-4 text-white">
-                  Ce que <span className="shimmer">tu te demandes.</span>
+                  {t("faqTitle1")}<span className="shimmer">{t("faqTitle2")}</span>
                 </h2>
               </Reveal>
               <Reveal delay={160}>
                 <p className="mt-5 text-[15px] text-ink-mute leading-relaxed">
-                  Huit réponses courtes. Si une question manque, écris-nous : on l&apos;ajoute.
+                  {t("faqIntro")}
                 </p>
               </Reveal>
             </div>
 
             <div className="lg:col-span-8 space-y-2">
-              {FAQ.map((item, i) => (
+              {faq.map((item, i) => (
                 <Reveal key={i} delay={i * 50}>
                   <details className="card rounded-2xl p-5 lg:p-6 group">
                     <summary className="cursor-pointer flex items-center justify-between gap-4 text-[15px] lg:text-[16px] text-white list-none">
@@ -221,20 +175,18 @@ export default function Page() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div className="lg:col-span-7">
               <Reveal>
-                <span className="h-eyebrow">Suite logique</span>
+                <span className="h-eyebrow">{t("nextEyebrow")}</span>
               </Reveal>
               <Reveal delay={80}>
                 <h2 className="h-title text-[28px] lg:text-[36px] mt-4 text-white">
-                  Le calcul, c&apos;est avant.
+                  {t("nextTitle1")}
                   <br />
-                  <span className="shimmer">La mesure, c&apos;est après.</span>
+                  <span className="shimmer">{t("nextTitle2")}</span>
                 </h2>
               </Reveal>
               <Reveal delay={160}>
                 <p className="mt-5 text-[15px] text-ink-mute leading-relaxed max-w-xl">
-                  Ce que tu calcules ici, Meridian Journal le mesure après le trade.
-                  Heures profitables, instruments rentables, patterns d&apos;erreur récurrents.
-                  Disponible plus tard cette année.
+                  {t("nextText")}
                 </p>
               </Reveal>
             </div>
@@ -242,10 +194,10 @@ export default function Page() {
               <Reveal delay={220}>
                 <div className="flex flex-wrap gap-3">
                   <Link href="/journal" className="btn btn-primary">
-                    Découvrir Journal
+                    {t("discoverJournal")}
                   </Link>
                   <Link href="/strategies" className="btn btn-ghost">
-                    Voir les stratégies
+                    {t("seeStrategies")}
                   </Link>
                 </div>
               </Reveal>
@@ -258,11 +210,7 @@ export default function Page() {
         <div className="max-w-wrap mx-auto px-6 sm:px-10">
           <div className="rounded-xl border border-border bg-panel p-5 lg:p-6">
             <p className="mono text-[10px] uppercase tracking-[0.15em] text-ink-faint leading-relaxed">
-              Outil pédagogique. Les calculs reposent sur les paramètres que tu saisis et sur
-              des taux de conversion indicatifs. Le trading de produits à effet de levier
-              comporte un risque élevé de perte en capital. Meridian ne fournit aucun conseil
-              en investissement ni recommandation personnalisée (AMF, Position DOC-2008-23).
-              Les performances passées ne préjugent pas des performances futures.
+              {t("disclaimer")}
             </p>
           </div>
         </div>

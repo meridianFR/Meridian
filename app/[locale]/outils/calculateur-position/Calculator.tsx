@@ -1,13 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   ACCOUNT_CURRENCIES,
   AccountCurrency,
   INSTRUMENTS,
   Instrument,
+  InstrumentCategory,
   calculate,
-  categoryLabel,
   findInstrument,
   formatLot,
   formatMoney,
@@ -77,7 +78,18 @@ function readUrl(): Partial<{
   return out;
 }
 
+const CATEGORY_KEY: Record<InstrumentCategory, string> = {
+  forex: "catForex",
+  "forex-jpy": "catForex",
+  metals: "catMetals",
+  indices: "catIndices",
+  crypto: "catCrypto",
+  energy: "catEnergy",
+};
+
 export function Calculator() {
+  const t = useTranslations("Calc");
+  const catLabel = (c: InstrumentCategory) => t(CATEGORY_KEY[c]);
   const [capital, setCapital] = useState<number>(25000);
   const [accountCurrency, setAccountCurrency] = useState<AccountCurrency>("EUR");
   const [instrumentSymbol, setInstrumentSymbol] = useState<string>("EUR/USD");
@@ -180,7 +192,7 @@ export function Calculator() {
     const presets = [0.5, 1.0, 2.0];
     return presets.map((pct) => ({
       pct,
-      label: pct === 0.5 ? "Conservateur" : pct === 1.0 ? "Standard" : "Agressif",
+      label: pct === 0.5 ? t("scenConservative") : pct === 1.0 ? t("scenStandard") : t("scenAggressive"),
       result: calculate({ ...baseInput, riskPct: pct }),
     }));
   }, [baseInput]);
@@ -256,36 +268,36 @@ export function Calculator() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6">
       <section
-        aria-label="Paramètres du calcul"
+        aria-label={t("paramsAria")}
         className="lg:col-span-5 card rounded-2xl p-6 lg:p-7"
       >
         <div className="flex items-center justify-between mb-6">
-          <span className="h-eyebrow">Paramètres</span>
+          <span className="h-eyebrow">{t("params")}</span>
           <button
             onClick={reset}
             className="mono text-[10px] uppercase tracking-[0.2em] text-ink-faint hover:text-white transition-colors"
-            aria-label="Réinitialiser"
+            aria-label={t("resetAria")}
           >
-            Reset
+            {t("reset")}
           </button>
         </div>
 
         <div className="space-y-5">
           <div>
-            <Label>Direction</Label>
+            <Label>{t("direction")}</Label>
             <div className="grid grid-cols-2 gap-2 mt-2">
               <DirectionButton active={direction === "long"} onClick={() => setDirection("long")} variant="long">
-                Long
+                {t("long")}
               </DirectionButton>
               <DirectionButton active={direction === "short"} onClick={() => setDirection("short")} variant="short">
-                Short
+                {t("short")}
               </DirectionButton>
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <NumberField
-              label="Capital"
+              label={t("capital")}
               suffix={accountCurrency}
               value={capital}
               onChange={setCapital}
@@ -293,7 +305,7 @@ export function Calculator() {
               min={0}
             />
             <div>
-              <Label>Devise</Label>
+              <Label>{t("currency")}</Label>
               <div className="mt-2 grid grid-cols-4 gap-1">
                 {ACCOUNT_CURRENCIES.map((ccy) => (
                   <button
@@ -314,12 +326,12 @@ export function Calculator() {
 
           <div>
             <div className="flex items-center justify-between">
-              <Label>Instrument</Label>
+              <Label>{t("instrument")}</Label>
               <button
                 onClick={() => setSearchOpen((o) => !o)}
                 className="mono text-[10px] uppercase tracking-[0.2em] text-ink-faint hover:text-white transition-colors"
               >
-                {searchOpen ? "Fermer" : "Tous"}
+                {searchOpen ? t("close") : t("all")}
               </button>
             </div>
             {!searchOpen ? (
@@ -341,17 +353,17 @@ export function Calculator() {
                   onClick={() => setSearchOpen(true)}
                   className="px-3 h-8 rounded-full border border-dashed border-border-2 text-[12px] mono text-ink-muted hover:text-white hover:border-ink-muted transition-colors"
                 >
-                  + autre
+                  {t("other")}
                 </button>
               </div>
             ) : (
               <div className="mt-2 rounded-xl border border-border bg-panel">
                 <input
                   type="text"
-                  aria-label="Chercher un instrument"
+                  aria-label={t("searchAria")}
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Chercher un instrument…"
+                  placeholder={t("searchPlaceholder")}
                   className="w-full bg-transparent px-3 h-10 text-sm border-b border-border focus:outline-none focus:border-border-2 placeholder:text-ink-faint"
                   autoFocus
                 />
@@ -369,12 +381,12 @@ export function Calculator() {
                     >
                       <span className="mono text-[13px] text-white">{inst.symbol}</span>
                       <span className="text-[11px] text-ink-faint mono uppercase tracking-[0.15em]">
-                        {categoryLabel(inst.category)}
+                        {catLabel(inst.category)}
                       </span>
                     </button>
                   ))}
                   {filteredInstruments.length === 0 && (
-                    <div className="px-3 py-4 text-[12px] text-ink-faint">Aucun instrument.</div>
+                    <div className="px-3 py-4 text-[12px] text-ink-faint">{t("noInstrument")}</div>
                   )}
                 </div>
               </div>
@@ -382,7 +394,7 @@ export function Calculator() {
           </div>
 
           <NumberField
-            label="Prix d'entrée"
+            label={t("entryPrice")}
             value={entryPrice}
             onChange={handleEntryChange}
             step={instrument.pipSize}
@@ -392,15 +404,15 @@ export function Calculator() {
 
           <div>
             <div className="flex items-center justify-between mb-2">
-              <Label>Stop loss</Label>
+              <Label>{t("stopLoss")}</Label>
               <ModeSwitch mode={slMode} onChange={setSlMode} />
             </div>
             {slMode === "pips" ? (
               <NumberField
                 value={slPips}
                 onChange={setSlPips}
-                ariaLabel="Stop loss en pips"
-                suffix="pips"
+                ariaLabel={t("slPipsAria")}
+                suffix={t("pips")}
                 step={1}
                 min={0}
                 bare
@@ -409,7 +421,7 @@ export function Calculator() {
               <NumberField
                 value={slPrice}
                 onChange={setSlPrice}
-                ariaLabel="Stop loss en prix"
+                ariaLabel={t("slPriceAria")}
                 step={instrument.pipSize}
                 precision={instrument.pricePrecision}
                 min={0}
@@ -420,15 +432,15 @@ export function Calculator() {
 
           <div>
             <div className="flex items-center justify-between mb-2">
-              <Label>Take profit (optionnel)</Label>
+              <Label>{t("takeProfit")}</Label>
               <ModeSwitch mode={tpMode} onChange={setTpMode} />
             </div>
             {tpMode === "pips" ? (
               <NumberField
                 value={tpPips}
                 onChange={setTpPips}
-                ariaLabel="Take profit en pips"
-                suffix="pips"
+                ariaLabel={t("tpPipsAria")}
+                suffix={t("pips")}
                 step={1}
                 min={0}
                 bare
@@ -437,7 +449,7 @@ export function Calculator() {
               <NumberField
                 value={tpPrice}
                 onChange={setTpPrice}
-                ariaLabel="Take profit en prix"
+                ariaLabel={t("tpPriceAria")}
                 step={instrument.pipSize}
                 precision={instrument.pricePrecision}
                 min={0}
@@ -448,7 +460,7 @@ export function Calculator() {
 
           <div>
             <div className="flex items-end justify-between mb-3">
-              <Label>Risque par trade</Label>
+              <Label>{t("riskPerTrade")}</Label>
               <span
                 className={`mono text-[28px] tabular-nums leading-none tracking-tight ${
                   riskPct > 2 ? "text-risk" : "text-white"
@@ -466,23 +478,23 @@ export function Calculator() {
               value={riskPct}
               onChange={(e) => setRiskPct(parseFloat(e.target.value))}
               className={`risk-slider ${riskPct > 2 ? "risk-slider-danger" : ""}`}
-              aria-label="Pourcentage de risque par trade"
+              aria-label={t("riskAria")}
             />
             <div className="flex justify-between mono text-[10px] uppercase tracking-[0.2em] text-ink-faint mt-2">
-              <button onClick={() => setRiskPct(0.25)} className="hover:text-white transition-colors">0,25 %</button>
-              <button onClick={() => setRiskPct(0.5)} className="hover:text-white transition-colors">0,5 %</button>
-              <button onClick={() => setRiskPct(1)} className="hover:text-white transition-colors">1 %</button>
-              <button onClick={() => setRiskPct(2)} className="hover:text-white transition-colors">2 %</button>
-              <button onClick={() => setRiskPct(3)} className="hover:text-white transition-colors">3 %</button>
+              <button onClick={() => setRiskPct(0.25)} className="hover:text-white transition-colors">{t("preset025")}</button>
+              <button onClick={() => setRiskPct(0.5)} className="hover:text-white transition-colors">{t("preset05")}</button>
+              <button onClick={() => setRiskPct(1)} className="hover:text-white transition-colors">{t("preset1")}</button>
+              <button onClick={() => setRiskPct(2)} className="hover:text-white transition-colors">{t("preset2")}</button>
+              <button onClick={() => setRiskPct(3)} className="hover:text-white transition-colors">{t("preset3")}</button>
             </div>
           </div>
 
           <div className="flex flex-wrap gap-2 pt-2">
             <button onClick={copyShareUrl} className="btn btn-ghost text-[12px]">
-              {copied ? "Lien copié" : "Copier le lien"}
+              {copied ? t("linkCopied") : t("copyLink")}
             </button>
             <a href="#methode" className="btn btn-ghost text-[12px]">
-              Pourquoi ?
+              {t("why")}
             </a>
           </div>
         </div>
@@ -494,28 +506,28 @@ export function Calculator() {
       >
         <div className="glow-border rounded-2xl p-6 lg:p-8">
           <div className="flex items-center justify-between mb-5">
-            <span className="h-eyebrow">Ton scénario · {riskPct.toFixed(2)} %</span>
+            <span className="h-eyebrow">{t("yourScenario")} · {riskPct.toFixed(2)} %</span>
             <span
               className={`pill ${result.isValid ? "pill-green" : "pill-red"}`}
             >
-              {result.isValid ? "Calcul valide" : "Paramètres incomplets"}
+              {result.isValid ? t("valid") : t("incomplete")}
             </span>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-border rounded-xl overflow-hidden">
-            <ResultCell label="Taille" value={formatLot(result.positionSizeLots)} suffix="lot" primary />
-            <ResultCell label="Risque" value={formatMoney(result.riskAmount, accountCurrency)} />
-            <ResultCell label="R:R" value={formatRR(result.rr)} />
+            <ResultCell label={t("resSize")} value={formatLot(result.positionSizeLots)} suffix={t("lot")} primary />
+            <ResultCell label={t("resRisk")} value={formatMoney(result.riskAmount, accountCurrency)} />
+            <ResultCell label={t("resRR")} value={formatRR(result.rr)} />
             <ResultCell
-              label="Reward"
+              label={t("resReward")}
               value={result.reward ? formatMoney(result.reward, accountCurrency) : "—"}
               tone={result.reward ? "edge" : "default"}
             />
           </div>
           <div className="mt-5 grid grid-cols-2 md:grid-cols-4 gap-px text-[11px] mono uppercase tracking-[0.15em] text-ink-faint">
-            <Meta label="Pip value" value={`${formatMoney(result.pipValuePerLot, accountCurrency)}/lot`} />
-            <Meta label="SL distance" value={`${formatPips(result.slDistancePips)} pips`} />
-            <Meta label="Perte / lot" value={formatMoney(result.lossPerLot, accountCurrency)} />
-            <Meta label="Unités" value={result.positionSizeUnits >= 1 ? result.positionSizeUnits.toFixed(0) : result.positionSizeUnits.toFixed(2)} />
+            <Meta label={t("metaPipValue")} value={`${formatMoney(result.pipValuePerLot, accountCurrency)}/${t("lot")}`} />
+            <Meta label={t("metaSlDistance")} value={`${formatPips(result.slDistancePips)} ${t("pips")}`} />
+            <Meta label={t("metaLossPerLot")} value={formatMoney(result.lossPerLot, accountCurrency)} />
+            <Meta label={t("metaUnits")} value={result.positionSizeUnits >= 1 ? result.positionSizeUnits.toFixed(0) : result.positionSizeUnits.toFixed(2)} />
           </div>
           {result.warnings.length > 0 && (
             <ul className="mt-5 space-y-1 text-[12px] text-risk/90">
@@ -528,9 +540,9 @@ export function Calculator() {
 
         <div>
           <div className="flex items-center justify-between mb-3">
-            <span className="h-eyebrow">Comparaison · 3 profils</span>
+            <span className="h-eyebrow">{t("comparison")}</span>
             <span className="mono text-[10px] uppercase tracking-[0.2em] text-ink-faint">
-              SL = {formatPips(result.slDistancePips)} pips
+              {t("slEquals", { pips: formatPips(result.slDistancePips) })}
             </span>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -552,11 +564,11 @@ export function Calculator() {
                   <span className="text-ink-faint text-[13px] ml-1">lot</span>
                 </div>
                 <div className="mt-3 flex items-center justify-between text-[12px] text-ink-mute">
-                  <span>Risque</span>
+                  <span>{t("scRisk")}</span>
                   <span className="mono tabular-nums">{formatMoney(s.result.riskAmount, accountCurrency)}</span>
                 </div>
                 <div className="mt-1 flex items-center justify-between text-[12px] text-ink-mute">
-                  <span>Reward</span>
+                  <span>{t("scReward")}</span>
                   <span className="mono tabular-nums">
                     {s.result.reward ? formatMoney(s.result.reward, accountCurrency) : "—"}
                   </span>
@@ -676,6 +688,7 @@ function ModeSwitch({
   mode: "pips" | "price";
   onChange: (m: "pips" | "price") => void;
 }) {
+  const t = useTranslations("Calc");
   return (
     <div className="flex items-center gap-1 mono text-[10px] uppercase tracking-[0.2em]">
       <button
@@ -684,7 +697,7 @@ function ModeSwitch({
           mode === "pips" ? "bg-white text-black" : "text-ink-faint hover:text-white"
         }`}
       >
-        Pips
+        {t("modePips")}
       </button>
       <button
         onClick={() => onChange("price")}
@@ -692,7 +705,7 @@ function ModeSwitch({
           mode === "price" ? "bg-white text-black" : "text-ink-faint hover:text-white"
         }`}
       >
-        Prix
+        {t("modePrice")}
       </button>
     </div>
   );
@@ -778,6 +791,7 @@ function Visualizer({
   direction: "long" | "short";
   accountCurrency: string;
 }) {
+  const t = useTranslations("Calc");
   const rr = result.rr ?? 0;
   const slPosition = 50;
   const entryPosition = 50 + (direction === "long" ? 200 : -200);
@@ -796,9 +810,9 @@ function Visualizer({
   return (
     <div className="card rounded-2xl p-6 lg:p-7">
       <div className="flex items-center justify-between mb-5">
-        <span className="h-eyebrow">Visualiseur · SL / Entry / TP</span>
+        <span className="h-eyebrow">{t("visualizer")}</span>
         <span className="mono text-[10px] uppercase tracking-[0.2em] text-ink-faint">
-          {direction === "long" ? "Long" : "Short"}
+          {direction === "long" ? t("long") : t("short")}
         </span>
       </div>
       <div className="relative">
@@ -905,20 +919,21 @@ function DrawdownPanel({
   drawdownPct: number;
   series: { n: number; remaining: number; drawdownPct: number }[];
 }) {
+  const t = useTranslations("Calc");
   const maxDrawdown = series[series.length - 1].drawdownPct;
   return (
     <div className="card rounded-2xl p-6 lg:p-7">
       <div className="flex items-center justify-between mb-5">
-        <span className="h-eyebrow">Drawdown projeté</span>
+        <span className="h-eyebrow">{t("drawdownProjected")}</span>
         <span className="mono text-[10px] uppercase tracking-[0.2em] text-ink-faint">
-          {riskPct.toFixed(2)} % par trade
+          {t("perTrade", { pct: riskPct.toFixed(2) })}
         </span>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-border rounded-xl overflow-hidden mb-6">
         <div className="bg-panel-2 px-4 py-4">
           <div className="mono text-[10px] uppercase tracking-[0.2em] text-ink-faint mb-1.5">
-            Pertes consécutives
+            {t("consecutiveLosses")}
           </div>
           <div className="mono text-[32px] tabular-nums tracking-tight text-white leading-none">
             {n}
@@ -926,7 +941,7 @@ function DrawdownPanel({
         </div>
         <div className="bg-panel-2 px-4 py-4">
           <div className="mono text-[10px] uppercase tracking-[0.2em] text-ink-faint mb-1.5">
-            Capital restant
+            {t("remainingCapital")}
           </div>
           <div className="mono text-[22px] tabular-nums tracking-tight text-white leading-none">
             {formatMoney(remaining, accountCurrency)}
@@ -934,7 +949,7 @@ function DrawdownPanel({
         </div>
         <div className="bg-panel-2 px-4 py-4">
           <div className="mono text-[10px] uppercase tracking-[0.2em] text-ink-faint mb-1.5">
-            Drawdown
+            {t("drawdown")}
           </div>
           <div className="mono text-[22px] tabular-nums tracking-tight text-risk leading-none">
             -{drawdownPct.toFixed(2)} %
@@ -950,7 +965,7 @@ function DrawdownPanel({
         value={n}
         onChange={(e) => onChangeN(parseInt(e.target.value))}
         className="risk-slider mb-6"
-        aria-label="Nombre de pertes consécutives"
+        aria-label={t("lossesCountAria")}
       />
 
       <div className="space-y-1.5">
@@ -985,8 +1000,7 @@ function DrawdownPanel({
       </div>
 
       <p className="mt-5 text-[12px] text-ink-muted leading-relaxed">
-        À {riskPct.toFixed(2)} % par trade, {n} pertes consécutives effacent {drawdownPct.toFixed(2)} % du capital.
-        La maths est géométrique, pas linéaire — chaque perte réduit la base sur laquelle s&apos;applique la suivante.
+        {t("drawdownExplain", { pct: riskPct.toFixed(2), n, dd: drawdownPct.toFixed(2) })}
       </p>
     </div>
   );
