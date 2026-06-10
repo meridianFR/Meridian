@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 const inputClass =
@@ -11,6 +12,7 @@ const labelClass = "mono text-[10px] uppercase tracking-[0.3em] text-ink-faint";
 type Status = "idle" | "loading" | "error";
 
 export function ResetPasswordForm() {
+  const t = useTranslations("Auth");
   const [password, setPassword] = useState("");
   const [status, setStatus] = useState<Status>("idle");
   const [message, setMessage] = useState("");
@@ -20,7 +22,7 @@ export function ResetPasswordForm() {
     if (status === "loading") return;
     if (password.length < 8) {
       setStatus("error");
-      setMessage("Le mot de passe doit faire au moins 8 caractères.");
+      setMessage(t("errMin8"));
       return;
     }
     setStatus("loading");
@@ -29,7 +31,7 @@ export function ResetPasswordForm() {
     const { error } = await supabase.auth.updateUser({ password });
     if (error) {
       setStatus("error");
-      setMessage("Lien expiré ou invalide. Redemande un lien de réinitialisation.");
+      setMessage(t("errResetInvalid"));
       return;
     }
     window.location.assign("/app");
@@ -37,7 +39,7 @@ export function ResetPasswordForm() {
 
   return (
     <form onSubmit={onSubmit} className="rounded-2xl border border-border bg-[#070707] p-8">
-      <label htmlFor="password" className={labelClass}>Nouveau mot de passe</label>
+      <label htmlFor="password" className={labelClass}>{t("newPasswordLabel")}</label>
       <input
         id="password"
         type="password"
@@ -45,14 +47,14 @@ export function ResetPasswordForm() {
         autoComplete="new-password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
-        placeholder="8 caractères minimum"
+        placeholder={t("min8Placeholder")}
         className={inputClass}
       />
 
       {status === "error" && (
         <div className="mt-3 text-sm text-risk">
           {message}{" "}
-          <Link href="/mot-de-passe-oublie" className="link-underline">Redemander un lien</Link>
+          <Link href="/mot-de-passe-oublie" className="link-underline">{t("requestNew")}</Link>
         </div>
       )}
 
@@ -61,7 +63,7 @@ export function ResetPasswordForm() {
         disabled={status === "loading"}
         className="btn btn-primary mt-6 w-full justify-center disabled:opacity-60"
       >
-        {status === "loading" ? "Enregistrement…" : "Enregistrer le mot de passe"}
+        {status === "loading" ? t("resetLoading") : t("resetSubmit")}
       </button>
     </form>
   );

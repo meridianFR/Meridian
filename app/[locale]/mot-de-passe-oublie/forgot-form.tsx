@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 const inputClass =
@@ -11,6 +12,7 @@ const labelClass = "mono text-[10px] uppercase tracking-[0.3em] text-ink-faint";
 type Status = "idle" | "loading" | "sent" | "error";
 
 export function ForgotPasswordForm() {
+  const t = useTranslations("Auth");
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<Status>("idle");
 
@@ -29,11 +31,13 @@ export function ForgotPasswordForm() {
   if (status === "sent") {
     return (
       <div className="rounded-2xl border border-border bg-[#070707] p-8 text-center">
-        <div className="mono text-[10px] uppercase tracking-[0.3em] text-edge mb-4">Email envoyé</div>
-        <p className="text-ink text-lg font-medium mb-2">Vérifie ta boîte mail</p>
+        <div className="mono text-[10px] uppercase tracking-[0.3em] text-edge mb-4">{t("forgotSentEyebrow")}</div>
+        <p className="text-ink text-lg font-medium mb-2">{t("forgotSentTitle")}</p>
         <p className="text-ink-mute text-sm leading-relaxed">
-          Si un compte existe pour <span className="text-ink">{email}</span>, tu vas recevoir un lien
-          pour choisir un nouveau mot de passe. Le lien expire dans une heure.
+          {t.rich("forgotSentText", {
+            email,
+            hl: (chunks) => <span className="text-ink">{chunks}</span>,
+          })}
         </p>
       </div>
     );
@@ -41,7 +45,7 @@ export function ForgotPasswordForm() {
 
   return (
     <form onSubmit={onSubmit} className="rounded-2xl border border-border bg-[#070707] p-8">
-      <label htmlFor="email" className={labelClass}>Adresse email</label>
+      <label htmlFor="email" className={labelClass}>{t("emailLabel")}</label>
       <input
         id="email"
         type="email"
@@ -49,7 +53,7 @@ export function ForgotPasswordForm() {
         autoComplete="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        placeholder="toi@email.com"
+        placeholder={t("emailPlaceholder")}
         className={inputClass}
       />
 
@@ -58,11 +62,11 @@ export function ForgotPasswordForm() {
         disabled={status === "loading"}
         className="btn btn-primary mt-6 w-full justify-center disabled:opacity-60"
       >
-        {status === "loading" ? "Envoi…" : "Recevoir le lien"}
+        {status === "loading" ? t("forgotLoading") : t("forgotSubmit")}
       </button>
 
       <div className="mt-6 pt-5 border-t border-border text-center">
-        <Link href="/connexion" className="link-underline text-sm text-ink">← Retour à la connexion</Link>
+        <Link href="/connexion" className="link-underline text-sm text-ink">{t("backToLogin")}</Link>
       </div>
     </form>
   );

@@ -1,5 +1,6 @@
-import { redirect } from "next/navigation";
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { AmbientOrbs } from "@/components/ambient-orbs";
 import { LockIcon } from "@/components/journal-logos";
 import { LoginForm } from "@/app/[locale]/connexion/login-form";
@@ -7,10 +8,18 @@ import { SetPasswordForm } from "./set-password-form";
 import { getStripe, provisionAccountFromSession } from "@/lib/stripe";
 import { isStripeConfigured } from "@/lib/env";
 
-export const metadata: Metadata = {
-  title: "Paiement reçu",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "Auth" });
+  return {
+    title: t("welcomeMetaTitle"),
+    robots: { index: false, follow: false },
+  };
+}
 
 export const dynamic = "force-dynamic";
 
@@ -43,18 +52,17 @@ export default async function BienvenuePage({
   }
 
   const canSetPassword = paid && !!email;
+  const t = await getTranslations("Auth");
 
   return (
     <main className="relative min-h-screen flex items-center justify-center px-6 py-28">
       <AmbientOrbs />
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <span className="mono text-[10px] uppercase tracking-[0.4em] text-edge">° Paiement reçu</span>
-          <h1 className="h-title text-3xl md:text-4xl mt-5">Bienvenue dans Meridian Journal</h1>
+          <span className="mono text-[10px] uppercase tracking-[0.4em] text-edge">{t("welcomeEyebrow")}</span>
+          <h1 className="h-title text-3xl md:text-4xl mt-5">{t("welcomeTitle")}</h1>
           <p className="text-ink-mute text-sm leading-relaxed mt-4">
-            {canSetPassword
-              ? "Ton abonnement est actif. Choisis un mot de passe pour ouvrir ton Journal et t'y reconnecter quand tu veux."
-              : "Ton abonnement est actif. Reçois ton lien d'accès par email pour ouvrir ton Journal."}
+            {canSetPassword ? t("welcomeTextSet") : t("welcomeTextLink")}
           </p>
         </div>
 
@@ -66,7 +74,7 @@ export default async function BienvenuePage({
 
         <div className="flex items-center justify-center gap-2 text-ink-mute mt-8">
           <LockIcon className="text-edge" />
-          <span className="text-[13px]">Accès sécurisé · paiement via Stripe</span>
+          <span className="text-[13px]">{t("welcomeSecure")}</span>
         </div>
       </div>
     </main>

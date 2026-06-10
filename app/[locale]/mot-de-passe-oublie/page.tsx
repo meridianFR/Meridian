@@ -1,16 +1,27 @@
-import Link from "next/link";
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 import { AmbientOrbs } from "@/components/ambient-orbs";
 import { ForgotPasswordForm } from "./forgot-form";
 
-export const metadata: Metadata = {
-  title: "Mot de passe oublié",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "Auth" });
+  return {
+    title: t("forgotMetaTitle"),
+    robots: { index: false, follow: false },
+  };
+}
 
 export const dynamic = "force-dynamic";
 
-export default function MotDePasseOubliePage() {
+export default async function MotDePasseOubliePage() {
+  const t = await getTranslations("Auth");
+
   return (
     <main className="relative min-h-screen flex items-center justify-center px-6 py-28">
       <AmbientOrbs />
@@ -22,10 +33,8 @@ export default function MotDePasseOubliePage() {
           >
             ° Meridian
           </Link>
-          <h1 className="h-title text-3xl md:text-4xl mt-5">Mot de passe oublié</h1>
-          <p className="text-ink-mute text-sm mt-3">
-            Entre ton email, on t'envoie un lien pour le réinitialiser.
-          </p>
+          <h1 className="h-title text-3xl md:text-4xl mt-5">{t("forgotHeading")}</h1>
+          <p className="text-ink-mute text-sm mt-3">{t("forgotSub")}</p>
         </div>
 
         <ForgotPasswordForm />

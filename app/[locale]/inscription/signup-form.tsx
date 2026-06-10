@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 const inputClass =
@@ -11,6 +12,7 @@ const labelClass = "mono text-[10px] uppercase tracking-[0.3em] text-ink-faint";
 type Status = "idle" | "loading" | "sent" | "error";
 
 export function SignupForm() {
+  const t = useTranslations("Auth");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [status, setStatus] = useState<Status>("idle");
@@ -21,7 +23,7 @@ export function SignupForm() {
     if (status === "loading") return;
     if (password.length < 8) {
       setStatus("error");
-      setMessage("Le mot de passe doit faire au moins 8 caractères.");
+      setMessage(t("errMin8"));
       return;
     }
     setStatus("loading");
@@ -37,9 +39,7 @@ export function SignupForm() {
     if (error) {
       setStatus("error");
       setMessage(
-        /already|exist/i.test(error.message)
-          ? "Un compte existe déjà avec cet email. Connecte-toi."
-          : "Inscription impossible. Vérifie l'adresse et réessaie.",
+        /already|exist/i.test(error.message) ? t("errExists") : t("errSignupGeneric"),
       );
       return;
     }
@@ -49,11 +49,13 @@ export function SignupForm() {
   if (status === "sent") {
     return (
       <div className="rounded-2xl border border-border bg-[#070707] p-8 text-center">
-        <div className="mono text-[10px] uppercase tracking-[0.3em] text-edge mb-4">Compte créé</div>
-        <p className="text-ink text-lg font-medium mb-2">Confirme ton adresse</p>
+        <div className="mono text-[10px] uppercase tracking-[0.3em] text-edge mb-4">{t("signupSentEyebrow")}</div>
+        <p className="text-ink text-lg font-medium mb-2">{t("signupSentTitle")}</p>
         <p className="text-ink-mute text-sm leading-relaxed">
-          On vient d'envoyer un email de confirmation à <span className="text-ink">{email}</span>.
-          Clique sur le lien pour activer ton compte, puis connecte-toi.
+          {t.rich("signupSentText", {
+            email,
+            hl: (chunks) => <span className="text-ink">{chunks}</span>,
+          })}
         </p>
       </div>
     );
@@ -61,7 +63,7 @@ export function SignupForm() {
 
   return (
     <form onSubmit={onSubmit} className="rounded-2xl border border-border bg-[#070707] p-8">
-      <label htmlFor="email" className={labelClass}>Adresse email</label>
+      <label htmlFor="email" className={labelClass}>{t("emailLabel")}</label>
       <input
         id="email"
         type="email"
@@ -69,11 +71,11 @@ export function SignupForm() {
         autoComplete="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        placeholder="toi@email.com"
+        placeholder={t("emailPlaceholder")}
         className={inputClass}
       />
 
-      <label htmlFor="password" className={`${labelClass} block mt-5`}>Mot de passe</label>
+      <label htmlFor="password" className={`${labelClass} block mt-5`}>{t("passwordLabel")}</label>
       <input
         id="password"
         type="password"
@@ -81,7 +83,7 @@ export function SignupForm() {
         autoComplete="new-password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
-        placeholder="8 caractères minimum"
+        placeholder={t("min8Placeholder")}
         className={inputClass}
       />
 
@@ -92,12 +94,12 @@ export function SignupForm() {
         disabled={status === "loading"}
         className="btn btn-primary mt-6 w-full justify-center disabled:opacity-60"
       >
-        {status === "loading" ? "Création…" : "Créer mon compte"}
+        {status === "loading" ? t("signupLoading") : t("signupSubmit")}
       </button>
 
       <div className="mt-6 pt-5 border-t border-border text-center">
-        <span className="text-ink-mute text-sm">Déjà un compte ? </span>
-        <Link href="/connexion" className="link-underline text-sm text-ink">Se connecter</Link>
+        <span className="text-ink-mute text-sm">{t("haveAccount")}</span>
+        <Link href="/connexion" className="link-underline text-sm text-ink">{t("signIn")}</Link>
       </div>
     </form>
   );

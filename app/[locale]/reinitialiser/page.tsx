@@ -1,16 +1,27 @@
-import Link from "next/link";
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 import { AmbientOrbs } from "@/components/ambient-orbs";
 import { ResetPasswordForm } from "./reset-form";
 
-export const metadata: Metadata = {
-  title: "Nouveau mot de passe",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "Auth" });
+  return {
+    title: t("resetMetaTitle"),
+    robots: { index: false, follow: false },
+  };
+}
 
 export const dynamic = "force-dynamic";
 
-export default function ReinitialiserPage() {
+export default async function ReinitialiserPage() {
+  const t = await getTranslations("Auth");
+
   return (
     <main className="relative min-h-screen flex items-center justify-center px-6 py-28">
       <AmbientOrbs />
@@ -22,8 +33,8 @@ export default function ReinitialiserPage() {
           >
             ° Meridian
           </Link>
-          <h1 className="h-title text-3xl md:text-4xl mt-5">Nouveau mot de passe</h1>
-          <p className="text-ink-mute text-sm mt-3">Choisis un nouveau mot de passe pour ton compte.</p>
+          <h1 className="h-title text-3xl md:text-4xl mt-5">{t("resetHeading")}</h1>
+          <p className="text-ink-mute text-sm mt-3">{t("resetSub")}</p>
         </div>
 
         <ResetPasswordForm />

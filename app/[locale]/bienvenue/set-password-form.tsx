@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 
 const inputClass =
@@ -10,6 +11,7 @@ const labelClass = "mono text-[10px] uppercase tracking-[0.3em] text-ink-faint";
 type Status = "idle" | "loading" | "error";
 
 export function SetPasswordForm({ sessionId, email }: { sessionId: string; email: string }) {
+  const t = useTranslations("Auth");
   const [password, setPassword] = useState("");
   const [status, setStatus] = useState<Status>("idle");
   const [message, setMessage] = useState("");
@@ -19,7 +21,7 @@ export function SetPasswordForm({ sessionId, email }: { sessionId: string; email
     if (status === "loading") return;
     if (password.length < 8) {
       setStatus("error");
-      setMessage("Le mot de passe doit faire au moins 8 caractères.");
+      setMessage(t("errMin8"));
       return;
     }
     setStatus("loading");
@@ -32,7 +34,7 @@ export function SetPasswordForm({ sessionId, email }: { sessionId: string; email
     });
     if (!res.ok) {
       setStatus("error");
-      setMessage("Impossible de définir le mot de passe. Réessaie dans un instant.");
+      setMessage(t("errSetFailed"));
       return;
     }
 
@@ -40,7 +42,7 @@ export function SetPasswordForm({ sessionId, email }: { sessionId: string; email
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
       setStatus("error");
-      setMessage("Mot de passe enregistré. Connecte-toi depuis la page de connexion.");
+      setMessage(t("errSetSignin"));
       return;
     }
     window.location.assign("/app");
@@ -48,7 +50,7 @@ export function SetPasswordForm({ sessionId, email }: { sessionId: string; email
 
   return (
     <form onSubmit={onSubmit} className="rounded-2xl border border-border bg-[#070707] p-8">
-      <label htmlFor="email" className={labelClass}>Ton compte</label>
+      <label htmlFor="email" className={labelClass}>{t("spAccount")}</label>
       <input
         id="email"
         type="email"
@@ -57,7 +59,7 @@ export function SetPasswordForm({ sessionId, email }: { sessionId: string; email
         className={`${inputClass} text-ink-mute`}
       />
 
-      <label htmlFor="password" className={`${labelClass} block mt-5`}>Choisis un mot de passe</label>
+      <label htmlFor="password" className={`${labelClass} block mt-5`}>{t("spChoose")}</label>
       <input
         id="password"
         type="password"
@@ -65,7 +67,7 @@ export function SetPasswordForm({ sessionId, email }: { sessionId: string; email
         autoComplete="new-password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
-        placeholder="8 caractères minimum"
+        placeholder={t("min8Placeholder")}
         className={inputClass}
       />
 
@@ -76,7 +78,7 @@ export function SetPasswordForm({ sessionId, email }: { sessionId: string; email
         disabled={status === "loading"}
         className="btn btn-primary mt-6 w-full justify-center disabled:opacity-60"
       >
-        {status === "loading" ? "Création…" : "Accéder à mon espace"}
+        {status === "loading" ? t("spLoading") : t("spSubmit")}
       </button>
     </form>
   );

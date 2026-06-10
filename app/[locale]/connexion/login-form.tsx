@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { sanitizeNextPath } from "@/lib/security";
 
@@ -13,6 +14,7 @@ const inputClass =
 const labelClass = "mono text-[10px] uppercase tracking-[0.3em] text-ink-faint";
 
 export function LoginForm({ next }: { next: string }) {
+  const t = useTranslations("Auth");
   const [mode, setMode] = useState<Mode>("password");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -39,7 +41,7 @@ export function LoginForm({ next }: { next: string }) {
     });
     if (error) {
       setStatus("error");
-      setMessage("Email ou mot de passe incorrect.");
+      setMessage(t("errCredentials"));
       return;
     }
     window.location.assign(safeNext);
@@ -59,7 +61,7 @@ export function LoginForm({ next }: { next: string }) {
     });
     if (error) {
       setStatus("error");
-      setMessage("Envoi impossible. Vérifie l'adresse et réessaie.");
+      setMessage(t("errMagic"));
       return;
     }
     setStatus("sent");
@@ -68,11 +70,13 @@ export function LoginForm({ next }: { next: string }) {
   if (status === "sent") {
     return (
       <div className="rounded-2xl border border-border bg-[#070707] p-8 text-center">
-        <div className="mono text-[10px] uppercase tracking-[0.3em] text-edge mb-4">Lien envoyé</div>
-        <p className="text-ink text-lg font-medium mb-2">Vérifie ta boîte mail</p>
+        <div className="mono text-[10px] uppercase tracking-[0.3em] text-edge mb-4">{t("loginSentEyebrow")}</div>
+        <p className="text-ink text-lg font-medium mb-2">{t("loginSentTitle")}</p>
         <p className="text-ink-mute text-sm leading-relaxed">
-          On vient d'envoyer un lien de connexion à <span className="text-ink">{email}</span>. Clique
-          dessus pour accéder à ton espace. Le lien expire dans une heure.
+          {t.rich("loginSentText", {
+            email,
+            hl: (chunks) => <span className="text-ink">{chunks}</span>,
+          })}
         </p>
       </div>
     );
@@ -82,7 +86,7 @@ export function LoginForm({ next }: { next: string }) {
     <div className="rounded-2xl border border-border bg-[#070707] p-8">
       {mode === "password" ? (
         <form onSubmit={onPassword}>
-          <label htmlFor="email" className={labelClass}>Adresse email</label>
+          <label htmlFor="email" className={labelClass}>{t("emailLabel")}</label>
           <input
             id="email"
             type="email"
@@ -90,17 +94,17 @@ export function LoginForm({ next }: { next: string }) {
             autoComplete="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="toi@email.com"
+            placeholder={t("emailPlaceholder")}
             className={inputClass}
           />
 
           <div className="mt-5 flex items-center justify-between">
-            <label htmlFor="password" className={labelClass}>Mot de passe</label>
+            <label htmlFor="password" className={labelClass}>{t("passwordLabel")}</label>
             <Link
               href="/mot-de-passe-oublie"
               className="mono text-[10px] uppercase tracking-[0.2em] text-ink-faint hover:text-ink-mute transition-colors"
             >
-              Oublié ?
+              {t("forgot")}
             </Link>
           </div>
           <input
@@ -121,7 +125,7 @@ export function LoginForm({ next }: { next: string }) {
             disabled={status === "loading"}
             className="btn btn-primary mt-6 w-full justify-center disabled:opacity-60"
           >
-            {status === "loading" ? "Connexion…" : "Se connecter"}
+            {status === "loading" ? t("loginLoading") : t("loginSubmit")}
           </button>
 
           <button
@@ -129,12 +133,12 @@ export function LoginForm({ next }: { next: string }) {
             onClick={() => switchMode("magic")}
             className="mono text-[10px] uppercase tracking-[0.25em] text-ink-faint hover:text-ink-mute transition-colors mt-5 w-full text-center"
           >
-            ou recevoir un lien par email
+            {t("toMagic")}
           </button>
         </form>
       ) : (
         <form onSubmit={onMagic}>
-          <label htmlFor="email-magic" className={labelClass}>Adresse email</label>
+          <label htmlFor="email-magic" className={labelClass}>{t("emailLabel")}</label>
           <input
             id="email-magic"
             type="email"
@@ -142,7 +146,7 @@ export function LoginForm({ next }: { next: string }) {
             autoComplete="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="toi@email.com"
+            placeholder={t("emailPlaceholder")}
             className={inputClass}
           />
 
@@ -153,7 +157,7 @@ export function LoginForm({ next }: { next: string }) {
             disabled={status === "loading"}
             className="btn btn-primary mt-6 w-full justify-center disabled:opacity-60"
           >
-            {status === "loading" ? "Envoi…" : "Recevoir le lien de connexion"}
+            {status === "loading" ? t("magicLoading") : t("magicSubmit")}
           </button>
 
           <button
@@ -161,14 +165,14 @@ export function LoginForm({ next }: { next: string }) {
             onClick={() => switchMode("password")}
             className="mono text-[10px] uppercase tracking-[0.25em] text-ink-faint hover:text-ink-mute transition-colors mt-5 w-full text-center"
           >
-            ← connexion par mot de passe
+            {t("toPassword")}
           </button>
         </form>
       )}
 
       <div className="mt-6 pt-5 border-t border-border text-center">
-        <span className="text-ink-mute text-sm">Pas encore de compte ? </span>
-        <Link href="/inscription" className="link-underline text-sm text-ink">Créer un compte</Link>
+        <span className="text-ink-mute text-sm">{t("noAccount")}</span>
+        <Link href="/inscription" className="link-underline text-sm text-ink">{t("createAccount")}</Link>
       </div>
     </div>
   );
