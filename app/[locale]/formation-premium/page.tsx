@@ -1,114 +1,25 @@
-import Link from "next/link";
+import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 import { AmbientOrbs } from "@/components/ambient-orbs";
 import { Reveal } from "@/components/reveal";
 import { FaqAccordion, type FaqItem } from "@/components/faq-accordion";
 
-export const metadata = {
-  title: "Formation — direction premium (test)",
-  description:
-    "Page test : exploration d'une direction design « formation premium » dans le branding Meridian.",
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "FormationPremium" });
+  return {
+    title: t("metaTitle"),
+    description: t("metaDescription"),
+  };
+}
 
-/* ------------------------------------------------------------------ data */
-
-const MODULES = [
-  {
-    n: "01",
-    title: "Fondamentaux de marché",
-    meta: "6 leçons · 1h40",
-    desc: "Lecture de structure, contexte, régimes. Construire une grille d'analyse stable, indépendante de l'humeur du jour.",
-    lessons: ["Structure & swing points", "Régimes de marché", "Zones de liquidité", "Cartographier un graphique"],
-  },
-  {
-    n: "02",
-    title: "Stratégies & configurations",
-    meta: "9 leçons · 2h55",
-    desc: "Les configurations génériques, documentées : entrée, invalidation, objectif. Savoir pourquoi tu entres — et où tu sors.",
-    lessons: ["Breakout de range", "Pullback de tendance", "Mean reversion", "Anatomie d'un setup"],
-  },
-  {
-    n: "03",
-    title: "Risque & taille de position",
-    meta: "7 leçons · 2h10",
-    desc: "Sizing, stop, drawdown, R. Ce qui sépare le trader qui dure de celui qui explose son compte sur un trade.",
-    lessons: ["Penser en R", "Calibrer son lot", "Traverser un drawdown", "Risque de corrélation"],
-  },
-  {
-    n: "04",
-    title: "Exécution & psychologie",
-    meta: "8 leçons · 2h30",
-    desc: "Transformer un plan en gestes répétables. Identifier ses biais, neutraliser le tilt, exécuter sans bruit.",
-    lessons: ["Construire un process", "FOMO, revenge, tilt", "Routine pré-marché", "Décider sous incertitude"],
-  },
-  {
-    n: "05",
-    title: "Journal & audit",
-    meta: "6 leçons · 1h50",
-    desc: "Mesurer ce que tu fais vraiment. Isoler ton edge, corriger tes fuites, décider sur des bases mesurables.",
-    lessons: ["Un journal exploitable", "Lire ses statistiques", "Identifier son edge", "L'audit 100 trades"],
-  },
-  {
-    n: "06",
-    title: "Construire sa méthode",
-    meta: "6 leçons · 2h05",
-    desc: "Assembler les briques en un plan écrit. Backtester, valider sur trois régimes, et tenir dans la durée.",
-    lessons: ["Écrire son plan", "Backtest manuel", "Valider une edge", "Plan de progression"],
-  },
-];
-
-const OUTCOMES = [
-  "Lire la structure d'un marché sans t'enterrer sous les indicateurs",
-  "Calibrer ton risque au lot près, à chaque trade",
-  "Documenter une configuration réellement tradable",
-  "Tenir un journal qui se transforme en décisions",
-  "Isoler ton edge sur un échantillon de 100 trades",
-  "Backtester une stratégie manuellement, proprement",
-  "Écrire un plan de trading complet, noir sur blanc",
-  "Repérer et neutraliser tes biais récurrents",
-];
-
-const INCLUDED = [
-  { t: "42 leçons vidéo", d: "≈ 13h, format court et dense. Pas de remplissage." },
-  { t: "Supports PDF", d: "Fiches, schémas et checklists téléchargeables." },
-  { t: "Accès aux outils", d: "Le Journal et le calculateur Meridian, inclus." },
-  { t: "Modèles prêts", d: "Plan de trading, journal, audit 100 trades." },
-  { t: "Mises à jour", d: "Le programme évolue, ton accès suit." },
-  { t: "Support par email", d: "Une question sur un module ? On répond." },
-];
-
-const NOT_THIS = ["Des signaux à recopier", "Une promesse de revenus", "Une recette magique", "Un groupe Telegram surchauffé"];
-const BUT_THIS = ["Une méthode structurée", "Des outils que tu mesures", "De la discipline, pas de la chance", "Des bases qui durent"];
-
-const PRICE_INCLUDES = [
-  "Les 6 modules · 42 leçons",
-  "Tous les supports PDF & modèles",
-  "Accès au Journal & au calculateur",
-  "Mises à jour à vie",
-  "Garantie 14 jours",
-];
-
-const FAQ: FaqItem[] = [
-  {
-    q: "Est-ce que cette formation garantit des gains ?",
-    a: "Non. Aucune formation sérieuse ne peut le faire, et personne ne devrait te le promettre. Meridian t'apprend une méthode et te donne les outils pour mesurer ce que tu fais. Le résultat dépend de ton travail et de ta discipline — pas d'un raccourci.",
-  },
-  {
-    q: "Pour quel niveau ?",
-    a: "Du débutant sérieux au trader intermédiaire qui veut structurer une approche dispersée. Si tu cherches un bouton magique, ce n'est pas le bon endroit.",
-  },
-  {
-    q: "Quels marchés, quelles plateformes ?",
-    a: "La méthode est générique : indices, forex, futures. Les outils sont pensés pour MT4/MT5 et les prop firms, mais les principes s'appliquent partout.",
-  },
-  {
-    q: "Combien de temps pour tout suivre ?",
-    a: "Environ 13h de vidéo, mais ce n'est pas une course. Compte plutôt quelques semaines en appliquant chaque module sur ton propre journal.",
-  },
-  {
-    q: "Y a-t-il une garantie ?",
-    a: "Oui, 14 jours. Si le contenu ne correspond pas à ce qui est décrit ici, tu es remboursé, sans discussion.",
-  },
-];
+type Module = { n: string; title: string; meta: string; desc: string; lessons: string[] };
+type Included = { t: string; d: string };
 
 /* ------------------------------------------------------------------ primitives */
 
@@ -118,7 +29,24 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
 
 /* ------------------------------------------------------------------ page */
 
-export default function Page() {
+export default async function Page() {
+  const t = await getTranslations("FormationPremium");
+
+  const modules = t.raw("modules") as Module[];
+  const outcomes = t.raw("outcomes") as string[];
+  const included = t.raw("included") as Included[];
+  const notThis = t.raw("notThis") as string[];
+  const butThis = t.raw("butThis") as string[];
+  const priceIncludes = t.raw("priceIncludes") as string[];
+  const faq = t.raw("faq") as FaqItem[];
+
+  const stats = [
+    { k: t("statModules"), v: "6" },
+    { k: t("statLessons"), v: "42" },
+    { k: t("statDuration"), v: "≈13h" },
+    { k: t("statLevel"), v: t("statLevelValue") },
+  ];
+
   return (
     <main className="relative min-h-screen overflow-hidden">
       {/* ============================================ HERO */}
@@ -133,37 +61,31 @@ export default function Page() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
             <div className="lg:col-span-7">
               <div className="flex items-center gap-3 mb-9 fade-in">
-                <Eyebrow>° Formation Meridian</Eyebrow>
-                <span className="pill pill-green">Programme 2026</span>
+                <Eyebrow>{t("heroEyebrow")}</Eyebrow>
+                <span className="pill pill-green">{t("heroBadge")}</span>
               </div>
 
               <h1 className="h-title text-[44px] sm:text-[60px] md:text-[76px] fade-in-up">
-                Devenir un trader
+                {t("heroTitle1")}
                 <br />
-                <span className="shimmer">méthodique.</span>
+                <span className="shimmer">{t("heroTitle2")}</span>
               </h1>
 
               <p className="text-ink-mute text-base md:text-lg max-w-xl mt-9 leading-relaxed fade-in-up-2">
-                Un programme complet, sans promesse de revenus ni recette magique. La méthode, les outils
-                et la discipline pour comprendre ce que tu trades — et le mesurer, trade après trade.
+                {t("heroIntro")}
               </p>
 
               <div className="flex flex-wrap gap-3 mt-11 fade-in-up-3">
                 <Link href="#inscription" className="btn btn-primary">
-                  Rejoindre la formation
+                  {t("joinCta")}
                 </Link>
                 <Link href="#programme" className="btn btn-ghost">
-                  Explorer le programme
+                  {t("exploreCta")}
                 </Link>
               </div>
 
               <div className="mt-12 grid grid-cols-2 sm:grid-cols-4 gap-px bg-border rounded-2xl overflow-hidden border border-border fade-in-up-3">
-                {[
-                  { k: "Modules", v: "6" },
-                  { k: "Leçons", v: "42" },
-                  { k: "Durée", v: "≈13h" },
-                  { k: "Niveau", v: "Déb.→Int." },
-                ].map((s) => (
+                {stats.map((s) => (
                   <div key={s.k} className="bg-black px-5 py-4">
                     <div className="mono text-[9px] uppercase tracking-[0.3em] text-ink-faint">{s.k}</div>
                     <div className="text-lg font-semibold mt-1">{s.v}</div>
@@ -176,12 +98,12 @@ export default function Page() {
             <div className="lg:col-span-5 fade-in-up-2">
               <div className="glow-border rounded-2xl bg-black/40 backdrop-blur-sm p-5 md:p-6">
                 <div className="flex items-center justify-between mb-5">
-                  <span className="mono text-[10px] uppercase tracking-[0.3em] text-ink-faint">Le programme</span>
-                  <span className="mono text-[10px] text-ink-faint">06 modules</span>
+                  <span className="mono text-[10px] uppercase tracking-[0.3em] text-ink-faint">{t("cardProgram")}</span>
+                  <span className="mono text-[10px] text-ink-faint">{t("cardModulesCount")}</span>
                 </div>
 
                 <div className="rounded-xl overflow-hidden border border-border divide-y divide-border">
-                  {MODULES.slice(0, 5).map((m) => (
+                  {modules.slice(0, 5).map((m) => (
                     <div key={m.n} className="flex items-center gap-4 px-4 py-3 bg-black/60">
                       <span className="mono text-[11px] text-ink-faint w-6 shrink-0">{m.n}</span>
                       <span className="text-[13px] text-ink flex-1 truncate">{m.title}</span>
@@ -190,20 +112,20 @@ export default function Page() {
                   ))}
                   <div className="flex items-center gap-4 px-4 py-3 bg-white/[0.03]">
                     <span className="mono text-[11px] text-ink-faint w-6 shrink-0">06</span>
-                    <span className="text-[13px] text-ink-mute flex-1">+ 1 module · construire sa méthode</span>
-                    <span className="mono text-[10px] text-ink-faint shrink-0">2h05</span>
+                    <span className="text-[13px] text-ink-mute flex-1">{t("cardModule6")}</span>
+                    <span className="mono text-[10px] text-ink-faint shrink-0">{t("cardModule6Duration")}</span>
                   </div>
                 </div>
 
                 <div className="flex items-end justify-between mt-6 pt-5 border-t border-border">
                   <div>
-                    <div className="mono text-[9px] uppercase tracking-[0.3em] text-ink-faint mb-1.5">Accès complet</div>
+                    <div className="mono text-[9px] uppercase tracking-[0.3em] text-ink-faint mb-1.5">{t("cardFullAccess")}</div>
                     <div className="text-3xl font-semibold tracking-tight">
                       390 €<span className="text-ink-faint text-base font-normal"> </span>
                     </div>
-                    <div className="mono text-[10px] text-ink-faint mt-1">paiement unique · accès à vie</div>
+                    <div className="mono text-[10px] text-ink-faint mt-1">{t("cardPriceNote")}</div>
                   </div>
-                  <span className="pill pill-white">Garantie 14j</span>
+                  <span className="pill pill-white">{t("cardGuarantee")}</span>
                 </div>
               </div>
             </div>
@@ -220,24 +142,23 @@ export default function Page() {
         <div className="max-w-wrap mx-auto px-6 sm:px-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
             <Reveal as="div" className="lg:col-span-5">
-              <Eyebrow>° La promesse</Eyebrow>
+              <Eyebrow>{t("philoEyebrow")}</Eyebrow>
               <h2 className="h-title text-4xl md:text-5xl mt-5">
-                Sans hype.
+                {t("philoTitle1")}
                 <br />
-                <span className="shimmer">Une discipline.</span>
+                <span className="shimmer">{t("philoTitle2")}</span>
               </h2>
               <p className="text-ink-mute text-sm leading-relaxed mt-6 max-w-sm">
-                La plupart des formations vendent un rêve. Celle-ci vend un métier : lent, mesurable,
-                répétable. C'est exactement ce qui la rend premium.
+                {t("philoText")}
               </p>
             </Reveal>
 
             <Reveal as="div" className="lg:col-span-7" delay={120}>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div className="card rounded-2xl p-7">
-                  <div className="mono text-[10px] uppercase tracking-[0.3em] text-risk/80 mb-5">Ce que ce n&apos;est pas</div>
+                  <div className="mono text-[10px] uppercase tracking-[0.3em] text-risk/80 mb-5">{t("notThisLabel")}</div>
                   <ul className="space-y-3.5">
-                    {NOT_THIS.map((x) => (
+                    {notThis.map((x) => (
                       <li key={x} className="flex items-start gap-3 text-sm text-ink-mute">
                         <span className="text-risk mt-0.5 shrink-0">✕</span>
                         {x}
@@ -246,9 +167,9 @@ export default function Page() {
                   </ul>
                 </div>
                 <div className="card rounded-2xl p-7">
-                  <div className="mono text-[10px] uppercase tracking-[0.3em] text-edge/80 mb-5">Ce que c&apos;est</div>
+                  <div className="mono text-[10px] uppercase tracking-[0.3em] text-edge/80 mb-5">{t("butThisLabel")}</div>
                   <ul className="space-y-3.5">
-                    {BUT_THIS.map((x) => (
+                    {butThis.map((x) => (
                       <li key={x} className="flex items-start gap-3 text-sm text-ink">
                         <span className="text-edge mt-0.5 shrink-0">✓</span>
                         {x}
@@ -268,22 +189,21 @@ export default function Page() {
           <Reveal>
             <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-14 md:mb-16">
               <div>
-                <Eyebrow>° Le programme</Eyebrow>
+                <Eyebrow>{t("programEyebrow")}</Eyebrow>
                 <h2 className="h-title text-4xl md:text-5xl mt-5 max-w-2xl">
-                  Six modules,
+                  {t("programTitle1")}
                   <br />
-                  <span className="shimmer">une progression.</span>
+                  <span className="shimmer">{t("programTitle2")}</span>
                 </h2>
               </div>
               <p className="text-ink-mute max-w-sm text-sm leading-relaxed">
-                Chaque module se suffit à lui-même mais s'emboîte dans le suivant. On part de la lecture
-                de marché, on finit avec un plan écrit que tu peux trader.
+                {t("programIntro")}
               </p>
             </div>
           </Reveal>
 
           <div className="grid grid-cols-1 gap-5">
-            {MODULES.map((m, i) => (
+            {modules.map((m, i) => (
               <Reveal key={m.n} delay={i * 80}>
                 <div className="card rounded-2xl p-7 md:p-9 group">
                   <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 items-start">
@@ -323,17 +243,17 @@ export default function Page() {
         <div className="max-w-wrap mx-auto px-6 sm:px-10">
           <Reveal>
             <div className="max-w-2xl mb-14">
-              <Eyebrow>° À la sortie</Eyebrow>
+              <Eyebrow>{t("outcomesEyebrow")}</Eyebrow>
               <h2 className="h-title text-4xl md:text-5xl mt-5">
-                Ce que tu sauras
+                {t("outcomesTitle1")}
                 <br />
-                <span className="shimmer">faire, concrètement.</span>
+                <span className="shimmer">{t("outcomesTitle2")}</span>
               </h2>
             </div>
           </Reveal>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-px bg-border rounded-2xl overflow-hidden border border-border">
-            {OUTCOMES.map((o, i) => (
+            {outcomes.map((o, i) => (
               <Reveal key={o} as="div" delay={(i % 2) * 80}>
                 <div className="bg-black p-7 flex items-start gap-4 h-full hover:bg-[#070707] transition-colors">
                   <span className="mono text-[11px] text-ink-faint mt-0.5 shrink-0">{String(i + 1).padStart(2, "0")}</span>
@@ -351,20 +271,19 @@ export default function Page() {
           <Reveal>
             <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-14">
               <div>
-                <Eyebrow>° Le format</Eyebrow>
+                <Eyebrow>{t("includedEyebrow")}</Eyebrow>
                 <h2 className="h-title text-4xl md:text-5xl mt-5 max-w-2xl">
-                  Tout est <span className="shimmer">inclus.</span>
+                  {t("includedTitle1")}<span className="shimmer">{t("includedTitle2")}</span>
                 </h2>
               </div>
               <p className="text-ink-mute max-w-sm text-sm leading-relaxed">
-                Un accès unique, des ressources concrètes, et les outils Meridian pour appliquer
-                immédiatement ce que tu apprends.
+                {t("includedIntro")}
               </p>
             </div>
           </Reveal>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {INCLUDED.map((it, i) => (
+            {included.map((it, i) => (
               <Reveal key={it.t} delay={(i % 3) * 90}>
                 <div className="card rounded-2xl p-7 h-full">
                   <span className="text-edge text-sm">✓</span>
@@ -386,9 +305,9 @@ export default function Page() {
         <div className="max-w-wrap mx-auto px-6 sm:px-10">
           <Reveal>
             <div className="text-center max-w-2xl mx-auto mb-14">
-              <Eyebrow>° Inscription</Eyebrow>
+              <Eyebrow>{t("signupEyebrow")}</Eyebrow>
               <h2 className="h-title text-4xl md:text-5xl mt-5">
-                Rejoindre la <span className="shimmer">formation.</span>
+                {t("signupTitle1")}<span className="shimmer">{t("signupTitle2")}</span>
               </h2>
             </div>
           </Reveal>
@@ -397,27 +316,27 @@ export default function Page() {
             <div className="glow-border glow-border-live rounded-3xl bg-black/50 backdrop-blur-sm p-8 md:p-12 max-w-3xl mx-auto">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
                 <div>
-                  <span className="pill pill-white">Accès complet</span>
+                  <span className="pill pill-white">{t("priceBadge")}</span>
                   <div className="mt-6 flex items-end gap-3">
                     <span className="text-6xl font-semibold tracking-tighter">390 €</span>
                     <span className="text-ink-faint text-sm mb-2 line-through">590 €</span>
                   </div>
-                  <p className="mono text-[11px] text-ink-faint mt-3">Paiement unique · accès à vie · TVA incluse</p>
+                  <p className="mono text-[11px] text-ink-faint mt-3">{t("priceNote")}</p>
 
                   <div className="mt-8 flex flex-col gap-3">
                     <Link href="#" className="btn btn-primary justify-center text-[15px] py-3.5">
-                      Rejoindre la formation
+                      {t("joinCta")}
                     </Link>
                     <p className="text-center mono text-[10px] uppercase tracking-[0.2em] text-ink-faint">
-                      Garantie 14 jours · sans abonnement
+                      {t("priceGuarantee")}
                     </p>
                   </div>
                 </div>
 
                 <div className="md:border-l md:border-border md:pl-10">
-                  <div className="mono text-[10px] uppercase tracking-[0.3em] text-ink-faint mb-5">Ce qui est inclus</div>
+                  <div className="mono text-[10px] uppercase tracking-[0.3em] text-ink-faint mb-5">{t("priceIncludesLabel")}</div>
                   <ul className="space-y-3.5">
-                    {PRICE_INCLUDES.map((x) => (
+                    {priceIncludes.map((x) => (
                       <li key={x} className="flex items-start gap-3 text-sm text-ink">
                         <span className="text-edge mt-0.5 shrink-0">✓</span>
                         {x}
@@ -430,8 +349,7 @@ export default function Page() {
           </Reveal>
 
           <p className="text-center text-ink-faint text-xs mt-8 max-w-xl mx-auto leading-relaxed">
-            Meridian ne fournit aucun conseil en investissement. Contenu pédagogique uniquement. Le trading
-            comporte un risque de perte en capital.
+            {t("signupDisclaimer")}
           </p>
         </div>
       </section>
@@ -441,15 +359,15 @@ export default function Page() {
         <div className="max-w-wrap mx-auto px-6 sm:px-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
             <Reveal as="div" className="lg:col-span-4">
-              <Eyebrow>° FAQ</Eyebrow>
+              <Eyebrow>{t("faqEyebrow")}</Eyebrow>
               <h2 className="h-title text-4xl md:text-5xl mt-5">
-                Questions
+                {t("faqTitle1")}
                 <br />
-                <span className="shimmer">fréquentes.</span>
+                <span className="shimmer">{t("faqTitle2")}</span>
               </h2>
             </Reveal>
             <Reveal as="div" className="lg:col-span-8" delay={120}>
-              <FaqAccordion items={FAQ} />
+              <FaqAccordion items={faq} />
             </Reveal>
           </div>
         </div>
@@ -464,17 +382,17 @@ export default function Page() {
         <div className="max-w-wrap mx-auto px-6 sm:px-10 text-center">
           <Reveal>
             <h2 className="h-title text-4xl md:text-6xl max-w-3xl mx-auto">
-              Trade ce que tu <span className="shimmer">mesures.</span>
+              {t("finalTitle1")}<span className="shimmer">{t("finalTitle2")}</span>
             </h2>
             <p className="text-ink-mute max-w-xl mx-auto mt-6 leading-relaxed">
-              La discipline ne s'improvise pas, elle s'apprend. Commence par les bonnes fondations.
+              {t("finalText")}
             </p>
             <div className="flex flex-wrap justify-center gap-3 mt-10">
               <Link href="#inscription" className="btn btn-primary">
-                Rejoindre la formation
+                {t("joinCta")}
               </Link>
               <Link href="/strategies" className="btn btn-ghost">
-                Voir les stratégies
+                {t("seeStrategies")}
               </Link>
             </div>
           </Reveal>
