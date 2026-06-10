@@ -1,16 +1,35 @@
 import type { MetadataRoute } from "next";
 import { STRATEGIES } from "@/lib/strategies";
-import { PILLARS, ARTICLES } from "@/lib/resources";
+import { getArticles, getPillars } from "@/lib/resources";
 
 const BASE = "https://meridiandata.fr";
+const LOCALES = ["fr", "en", "pt"] as const;
+type Loc = (typeof LOCALES)[number];
+
+/** URL localisée : le FR n'a pas de préfixe (localePrefix "as-needed"). */
+function localized(locale: Loc, path: string): string {
+  return locale === "fr" ? `${BASE}${path}` : `${BASE}/${locale}${path}`;
+}
+
+/** Carte hreflang pour une route donnée (fr + en + pt + x-default). */
+function languagesFor(path: string): Record<string, string> {
+  return {
+    fr: localized("fr", path),
+    en: localized("en", path),
+    pt: localized("pt", path),
+    "x-default": localized("fr", path),
+  };
+}
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
+  const entries: MetadataRoute.Sitemap = [];
 
-  // Pages statiques publiques (on exclut /journal-preview = démo, et /formation-premium = pilote)
-  const staticRoutes: { path: string; priority: number; freq: MetadataRoute.Sitemap[number]["changeFrequency"] }[] = [
+  // Pages statiques publiques TRADUITES (on exclut /journal-preview = démo,
+  // /formation-premium = pilote). Chaque route émet ses 3 variantes de langue
+  // avec les alternances hreflang.
+  const translatedRoutes: { path: string; priority: number; freq: MetadataRoute.Sitemap[number]["changeFrequency"] }[] = [
     { path: "", priority: 1.0, freq: "weekly" },
-    { path: "/strategies", priority: 0.9, freq: "weekly" },
     { path: "/ressources", priority: 0.9, freq: "weekly" },
     { path: "/outils", priority: 0.9, freq: "weekly" },
     { path: "/journal", priority: 0.8, freq: "monthly" },
@@ -29,13 +48,34 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/disclaimer-financier", priority: 0.3, freq: "yearly" },
   ];
 
-  const entries: MetadataRoute.Sitemap = staticRoutes.map((r) => ({
-    url: `${BASE}${r.path}`,
-    lastModified: now,
-    changeFrequency: r.freq,
-    priority: r.priority,
-  }));
+  // Académie Meridian — piliers + articles (slugs identiques dans les 3 langues)
+  for (const p of getPillars("fr")) {
+    translatedRoutes.push({ path: `/ressources/${p.slug}`, priority: 0.8, freq: "monthly" });
+  }
+  for (const a of getArticles("fr")) {
+    translatedRoutes.push({ path: `/ressources/${a.pillarSlug}/${a.slug}`, priority: 0.7, freq: "monthly" });
+  }
 
+  for (const r of translatedRoutes) {
+    const languages = languagesFor(r.path);
+    for (const locale of LOCALES) {
+      entries.push({
+        url: localized(locale, r.path),
+        lastModified: now,
+        changeFrequency: r.freq,
+        priority: r.priority,
+        alternates: { languages },
+      });
+    }
+  }
+
+  // Stratégies : refonte à venir, non traduites → FR uniquement (pas d'alternance).
+  entries.push({
+    url: `${BASE}/strategies`,
+    lastModified: now,
+    changeFrequency: "weekly",
+    priority: 0.9,
+  });
   for (const s of STRATEGIES) {
     entries.push({
       url: `${BASE}/strategies/${s.slug}`,
@@ -43,7 +83,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.6,
     });
-    // Pages anatomie : uniquement celles qui existent (hasDeepDive)
     if (s.hasDeepDive) {
       entries.push({
         url: `${BASE}/strategies/${s.slug}/anatomie`,
@@ -52,24 +91,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
         priority: 0.5,
       });
     }
-  }
-
-  // Académie Meridian — piliers (catégories) + articles
-  for (const p of PILLARS) {
-    entries.push({
-      url: `${BASE}/ressources/${p.slug}`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.8,
-    });
-  }
-  for (const a of ARTICLES) {
-    entries.push({
-      url: `${BASE}/ressources/${a.pillarSlug}/${a.slug}`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.7,
-    });
   }
 
   return entries;

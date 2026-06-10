@@ -2,13 +2,16 @@
 // Hero → bandeau AMF → guide long-form (children) → liste du cluster (articles
 // live + « à venir ») → ponts outils & produit. JSON-LD CollectionPage + Breadcrumb.
 
-import Link from "next/link";
+import { useLocale, useTranslations } from "next-intl";
 import type { ReactNode } from "react";
+import { Link } from "@/i18n/navigation";
 import { BASE_URL, articlesForPillar, type Pillar } from "@/lib/resources";
 
-function buildJsonLd(pillar: Pillar) {
+const INLANG: Record<string, string> = { fr: "fr-FR", en: "en-US", pt: "pt-PT" };
+
+function buildJsonLd(pillar: Pillar, locale: string, resourcesLabel: string) {
   const url = `${BASE_URL}/ressources/${pillar.slug}`;
-  const articles = articlesForPillar(pillar.slug);
+  const articles = articlesForPillar(locale, pillar.slug);
   return {
     "@context": "https://schema.org",
     "@graph": [
@@ -17,7 +20,7 @@ function buildJsonLd(pillar: Pillar) {
         "@id": `${url}#collection`,
         name: pillar.metaTitle ?? pillar.title,
         description: pillar.description,
-        inLanguage: "fr-FR",
+        inLanguage: INLANG[locale] ?? "fr-FR",
         about: pillar.keyword,
         isPartOf: { "@id": `${BASE_URL}/#website` },
         hasPart: articles.map((a) => ({
@@ -30,7 +33,7 @@ function buildJsonLd(pillar: Pillar) {
         "@type": "BreadcrumbList",
         "@id": `${url}#breadcrumb`,
         itemListElement: [
-          { "@type": "ListItem", position: 1, name: "Ressources", item: `${BASE_URL}/ressources` },
+          { "@type": "ListItem", position: 1, name: resourcesLabel, item: `${BASE_URL}/ressources` },
           { "@type": "ListItem", position: 2, name: pillar.title, item: url },
         ],
       },
@@ -39,13 +42,18 @@ function buildJsonLd(pillar: Pillar) {
 }
 
 export function PillarShell({ pillar, children }: { pillar: Pillar; children: ReactNode }) {
-  const articles = articlesForPillar(pillar.slug);
+  const t = useTranslations("Resources");
+  const locale = useLocale();
+  const articles = articlesForPillar(locale, pillar.slug);
+  const num = String(pillar.num).padStart(2, "0");
 
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(buildJsonLd(pillar)) }}
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(buildJsonLd(pillar, locale, t("resourcesFallback"))),
+        }}
       />
 
       {/* Hero */}
@@ -59,12 +67,12 @@ export function PillarShell({ pillar, children }: { pillar: Pillar; children: Re
             href="/ressources"
             className="mono text-[11px] uppercase tracking-widest text-ink-mute hover:text-white transition inline-block mb-8"
           >
-            ← Académie Meridian
+            {t("backToAcademy")}
           </Link>
 
           <div className="pill mb-6">
             <span className="w-1.5 h-1.5 rounded-full bg-white" />
-            <span>Pilier {String(pillar.num).padStart(2, "0")} · Guide complet</span>
+            <span>{t("pillarGuideBadge", { num })}</span>
           </div>
 
           <h1 className="h-title text-5xl md:text-7xl max-w-4xl mb-7">{pillar.title}.</h1>
@@ -80,9 +88,9 @@ export function PillarShell({ pillar, children }: { pillar: Pillar; children: Re
             !
           </div>
           <p className="text-sm text-ink-mute leading-relaxed">
-            Contenu pédagogique uniquement. <strong className="text-white">Aucune promesse de gain,
-            aucun signal, aucune statistique de performance.</strong> Le trading comporte un risque
-            de perte en capital.
+            {t("amfIntro")}
+            <strong className="text-white">{t("amfStrong")}</strong>
+            {t("amfEnd")}
           </p>
         </div>
       </section>
@@ -95,9 +103,9 @@ export function PillarShell({ pillar, children }: { pillar: Pillar; children: Re
       {/* Cluster : articles */}
       <section className="py-20">
         <div className="max-w-wrap mx-auto px-6 sm:px-10">
-          <div className="h-eyebrow mb-3">Dans ce guide</div>
+          <div className="h-eyebrow mb-3">{t("inThisGuide")}</div>
           <h2 className="h-title text-3xl md:text-4xl mb-10">
-            Approfondir <span className="shimmer">point par point</span>.
+            {t.rich("deepenTitle", { em: (chunks) => <span className="shimmer">{chunks}</span> })}
           </h2>
 
           {articles.length > 0 && (
@@ -109,15 +117,17 @@ export function PillarShell({ pillar, children }: { pillar: Pillar; children: Re
                   className="card rounded-2xl p-6 group block"
                 >
                   <div className="flex items-center justify-between mb-3">
-                    <span className="h-eyebrow">Article</span>
-                    <span className="mono text-[10px] text-ink-faint">{a.readingMinutes} min</span>
+                    <span className="h-eyebrow">{t("articleBadge")}</span>
+                    <span className="mono text-[10px] text-ink-faint">
+                      {t("minLabel", { min: a.readingMinutes })}
+                    </span>
                   </div>
                   <h3 className="font-semibold text-xl text-white mb-2 tracking-tight">{a.title}</h3>
                   <p className="text-sm text-ink-mute leading-relaxed line-clamp-2 mb-4">
                     {a.description}
                   </p>
                   <span className="mono text-[11px] uppercase tracking-widest text-ink-mute group-hover:text-white transition">
-                    Lire l'article →
+                    {t("readArticle")}
                   </span>
                 </Link>
               ))}
@@ -126,15 +136,15 @@ export function PillarShell({ pillar, children }: { pillar: Pillar; children: Re
 
           {pillar.upcoming.length > 0 && (
             <div>
-              <div className="h-eyebrow mb-4">À venir dans ce cluster</div>
+              <div className="h-eyebrow mb-4">{t("upcomingCluster")}</div>
               <div className="flex flex-wrap gap-2.5">
-                {pillar.upcoming.map((t) => (
+                {pillar.upcoming.map((title) => (
                   <span
-                    key={t}
+                    key={title}
                     className="inline-flex items-center gap-2 rounded-full border border-border bg-white/[0.015] px-4 py-2 text-sm text-ink-faint"
                   >
                     <span aria-hidden className="h-1 w-1 rounded-full bg-border-2" />
-                    {t}
+                    {title}
                   </span>
                 ))}
               </div>
@@ -149,21 +159,21 @@ export function PillarShell({ pillar, children }: { pillar: Pillar; children: Re
           <div className="divider" />
           <section className="py-20">
             <div className="max-w-wrap mx-auto px-6 sm:px-10">
-              <div className="h-eyebrow mb-3">Passer à la pratique</div>
+              <div className="h-eyebrow mb-3">{t("toPractice")}</div>
               <h2 className="h-title text-3xl md:text-4xl mb-10">
-                Les outils qui <span className="shimmer">automatisent</span> ce guide.
+                {t.rich("toolsTitle", { em: (chunks) => <span className="shimmer">{chunks}</span> })}
               </h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 {pillar.tools.map((tool) => (
                   <Link key={tool.href} href={tool.href} className="card rounded-2xl p-6 group block">
-                    <div className="h-eyebrow mb-3">Outil gratuit</div>
+                    <div className="h-eyebrow mb-3">{t("freeTool")}</div>
                     <h3 className="font-semibold text-lg text-white mb-2">{tool.label}</h3>
                     {tool.desc && (
                       <p className="text-sm text-ink-mute leading-relaxed mb-4">{tool.desc}</p>
                     )}
                     <span className="mono text-[11px] uppercase tracking-widest text-ink-mute group-hover:text-white transition">
-                      Ouvrir l'outil →
+                      {t("openTool")}
                     </span>
                   </Link>
                 ))}
@@ -173,7 +183,7 @@ export function PillarShell({ pillar, children }: { pillar: Pillar; children: Re
                     href={pillar.product.href}
                     className="glow-border rounded-2xl p-6 group block"
                   >
-                    <div className="h-eyebrow mb-3">Produit</div>
+                    <div className="h-eyebrow mb-3">{t("productBadge")}</div>
                     <h3 className="font-semibold text-lg text-white mb-2">{pillar.product.label}</h3>
                     {pillar.product.desc && (
                       <p className="text-sm text-ink-mute leading-relaxed mb-4">
@@ -181,7 +191,7 @@ export function PillarShell({ pillar, children }: { pillar: Pillar; children: Re
                       </p>
                     )}
                     <span className="mono text-[11px] uppercase tracking-widest text-white link-underline">
-                      Découvrir →
+                      {t("discover")}
                     </span>
                   </Link>
                 )}
@@ -197,7 +207,7 @@ export function PillarShell({ pillar, children }: { pillar: Pillar; children: Re
             href="/ressources"
             className="mono text-[11px] uppercase tracking-widest text-ink-mute hover:text-white transition"
           >
-            ← Tous les guides de l'Académie
+            {t("allGuides")}
           </Link>
         </div>
       </section>

@@ -1,18 +1,23 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { PILLARS, getPillar } from "@/lib/resources";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import { allPillarParams, getPillar } from "@/lib/resources";
 import { PillarShell } from "@/components/resources/pillar-shell";
-import { PILLAR_BODIES } from "@/components/resources/bodies";
+import { getPillarBody } from "@/components/resources/bodies";
 
 export function generateStaticParams() {
-  return PILLARS.map((p) => ({ pilier: p.slug }));
+  return allPillarParams();
 }
 
-type Params = { pilier: string };
+type Params = { locale: string; pilier: string };
 
-export async function generateMetadata({ params }: { params: Promise<Params> }) {
-  const { pilier } = await params;
-  const p = getPillar(pilier);
-  if (!p) return { title: "Guide introuvable" };
+export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
+  const { locale, pilier } = await params;
+  const p = getPillar(locale, pilier);
+  if (!p) {
+    const t = await getTranslations({ locale, namespace: "Resources" });
+    return { title: t("notFoundGuide") };
+  }
   const url = `/ressources/${p.slug}`;
   return {
     title: p.metaTitle ?? p.title,
@@ -28,9 +33,10 @@ export async function generateMetadata({ params }: { params: Promise<Params> }) 
 }
 
 export default async function PillarPage({ params }: { params: Promise<Params> }) {
-  const { pilier } = await params;
-  const pillar = getPillar(pilier);
+  const { locale, pilier } = await params;
+  setRequestLocale(locale);
+  const pillar = getPillar(locale, pilier);
   if (!pillar) notFound();
 
-  return <PillarShell pillar={pillar}>{PILLAR_BODIES[pillar.slug]}</PillarShell>;
+  return <PillarShell pillar={pillar}>{getPillarBody(locale, pillar.slug)}</PillarShell>;
 }

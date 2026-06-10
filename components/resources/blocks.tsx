@@ -2,16 +2,18 @@
 // Composants serveur, présentationnels, aux tokens Kairos. Aucun "use client" :
 // la FAQ utilise <details> natif (animation gérée par globals.css .faq-item).
 
-import Link from "next/link";
+import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
+import { Link } from "@/i18n/navigation";
 import type { FaqItem, LeadMagnet, Ref, TocItem } from "@/lib/resources";
 
 const READ_WIDTH = "max-w-[44rem]";
 
 /* ————— Fil d'Ariane ————— */
 export function Breadcrumb({ items }: { items: { href?: string; label: string }[] }) {
+  const t = useTranslations("Resources");
   return (
-    <nav aria-label="Fil d'Ariane" className="mb-8">
+    <nav aria-label={t("breadcrumbAria")} className="mb-8">
       <ol className="flex flex-wrap items-center gap-2 mono text-[11px] uppercase tracking-[0.15em] text-ink-faint">
         {items.map((it, i) => (
           <li key={i} className="flex items-center gap-2">
@@ -32,10 +34,11 @@ export function Breadcrumb({ items }: { items: { href?: string; label: string }[
 
 /* ————— Sommaire (TOC) ————— */
 export function Toc({ items }: { items: TocItem[] }) {
+  const t = useTranslations("Resources");
   if (!items.length) return null;
   return (
     <aside className={`${READ_WIDTH} mx-auto card rounded-2xl p-6 mb-14`}>
-      <div className="h-eyebrow mb-4">Sommaire</div>
+      <div className="h-eyebrow mb-4">{t("toc")}</div>
       <ol className="space-y-2.5">
         {items.map((it, i) => (
           <li key={it.id} className="flex items-baseline gap-3">
@@ -156,10 +159,11 @@ export function Callout({
 
 /** « À retenir » — synthèse en fin de section, liseré vivant. */
 export function KeyTakeaway({ children }: { children: ReactNode }) {
+  const t = useTranslations("Resources");
   return (
     <div className={`${READ_WIDTH} mx-auto my-10`}>
       <div className="glow-border rounded-2xl p-6">
-        <div className="h-eyebrow mb-3">À retenir</div>
+        <div className="h-eyebrow mb-3">{t("keyTakeaway")}</div>
         <div className="text-ink-mute leading-relaxed text-[15px] [&_strong]:text-white">{children}</div>
       </div>
     </div>
@@ -170,6 +174,7 @@ export function KeyTakeaway({ children }: { children: ReactNode }) {
 
 /** Outil en contexte. */
 export function ToolCTA({ tool }: { tool: Ref }) {
+  const t = useTranslations("Resources");
   return (
     <div className={`${READ_WIDTH} mx-auto my-8`}>
       <Link href={tool.href} className="card rounded-2xl p-6 flex items-center gap-5 group">
@@ -177,7 +182,7 @@ export function ToolCTA({ tool }: { tool: Ref }) {
           ƒx
         </span>
         <span className="flex-1">
-          <span className="h-eyebrow block mb-1.5">Outil gratuit</span>
+          <span className="h-eyebrow block mb-1.5">{t("freeTool")}</span>
           <span className="block font-semibold text-white">{tool.label}</span>
           {tool.desc && <span className="block text-sm text-ink-mute mt-1 leading-relaxed">{tool.desc}</span>}
         </span>
@@ -189,10 +194,11 @@ export function ToolCTA({ tool }: { tool: Ref }) {
 
 /** Aimant à email (content-upgrade). Pointe vers /formation en attendant Beehiiv. */
 export function LeadMagnetCTA({ magnet }: { magnet: LeadMagnet }) {
+  const t = useTranslations("Resources");
   return (
     <div className={`${READ_WIDTH} mx-auto my-10`}>
       <div className="glow-border rounded-2xl p-7 sm:p-8">
-        <div className="h-eyebrow mb-3">Ressource gratuite</div>
+        <div className="h-eyebrow mb-3">{t("freeResource")}</div>
         <h3 className="h-title text-xl md:text-2xl mb-2">{magnet.title}</h3>
         <p className="text-ink-mute text-sm leading-relaxed mb-6 max-w-md">{magnet.desc}</p>
         <Link href={magnet.href} className="btn btn-primary">
@@ -205,10 +211,11 @@ export function LeadMagnetCTA({ magnet }: { magnet: LeadMagnet }) {
 
 /** Pont produit soft (jamais une promesse de gain). */
 export function ProductBridge({ product }: { product: Ref }) {
+  const t = useTranslations("Resources");
   return (
     <div className={`${READ_WIDTH} mx-auto my-12`}>
       <div className="rounded-2xl border border-border bg-panel/40 p-7 sm:p-8">
-        <div className="h-eyebrow mb-3">Pour aller plus loin</div>
+        <div className="h-eyebrow mb-3">{t("forFurther")}</div>
         <p className="text-ink-mute leading-relaxed mb-6 [&_strong]:text-white">
           {product.desc}
         </p>
@@ -216,7 +223,7 @@ export function ProductBridge({ product }: { product: Ref }) {
           href={product.href}
           className="mono text-[11px] uppercase tracking-[0.2em] text-white link-underline"
         >
-          Découvrir {product.label} →
+          {t("discoverProduct", { label: product.label })}
         </Link>
       </div>
     </div>
@@ -225,10 +232,11 @@ export function ProductBridge({ product }: { product: Ref }) {
 
 /* ————— FAQ (FAQPage + accordéon natif) ————— */
 export function Faq({ items }: { items: FaqItem[] }) {
+  const t = useTranslations("Resources");
   if (!items.length) return null;
   return (
     <section className={`${READ_WIDTH} mx-auto my-16`}>
-      <div className="h-eyebrow mb-6">Questions fréquentes</div>
+      <div className="h-eyebrow mb-6">{t("faqTitle")}</div>
       <div className="space-y-3">
         {items.map((it, i) => (
           <details key={i} className="faq-item card rounded-xl p-5">
@@ -250,10 +258,11 @@ export function RelatedArticles({
 }: {
   items: { href: string; title: string; description: string; pillar: string }[];
 }) {
+  const t = useTranslations("Resources");
   if (!items.length) return null;
   return (
     <section className="max-w-wrap mx-auto px-6 sm:px-10 my-20">
-      <div className="h-eyebrow mb-6">À lire ensuite</div>
+      <div className="h-eyebrow mb-6">{t("readNext")}</div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         {items.map((it) => (
           <Link key={it.href} href={it.href} className="card rounded-2xl p-6 group block">
@@ -265,7 +274,7 @@ export function RelatedArticles({
             </h3>
             <p className="text-sm text-ink-mute leading-relaxed line-clamp-2">{it.description}</p>
             <span className="mono text-[11px] uppercase tracking-widest text-ink-mute group-hover:text-white transition mt-4 inline-block">
-              Lire →
+              {t("read")}
             </span>
           </Link>
         ))}
@@ -276,12 +285,11 @@ export function RelatedArticles({
 
 /* ————— Disclaimer AMF (réutilisé tel quel) ————— */
 export function Disclaimer() {
+  const t = useTranslations("Resources");
   return (
     <div className={`${READ_WIDTH} mx-auto my-12`}>
       <p className="mono text-[10px] uppercase tracking-[0.15em] text-ink-faint leading-relaxed border-t border-border pt-6">
-        Contenu pédagogique uniquement. Meridian ne fournit aucun conseil en investissement ni
-        recommandation personnalisée. Le trading comporte un risque de perte en capital. Les
-        performances passées ne préjugent pas des performances futures.
+        {t("disclaimer")}
       </p>
     </div>
   );

@@ -1,18 +1,23 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { allArticleParams, getArticle } from "@/lib/resources";
 import { ArticleShell } from "@/components/resources/article-shell";
-import { ARTICLE_BODIES } from "@/components/resources/bodies";
+import { getArticleBody } from "@/components/resources/bodies";
 
 export function generateStaticParams() {
   return allArticleParams();
 }
 
-type Params = { pilier: string; article: string };
+type Params = { locale: string; pilier: string; article: string };
 
-export async function generateMetadata({ params }: { params: Promise<Params> }) {
-  const { article } = await params;
-  const a = getArticle(article);
-  if (!a) return { title: "Article introuvable" };
+export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
+  const { locale, article } = await params;
+  const a = getArticle(locale, article);
+  if (!a) {
+    const t = await getTranslations({ locale, namespace: "Resources" });
+    return { title: t("notFoundArticle") };
+  }
   const url = `/ressources/${a.pillarSlug}/${a.slug}`;
   return {
     title: a.metaTitle ?? a.title,
@@ -28,12 +33,13 @@ export async function generateMetadata({ params }: { params: Promise<Params> }) 
 }
 
 export default async function ArticlePage({ params }: { params: Promise<Params> }) {
-  const { pilier, article } = await params;
-  const a = getArticle(article);
+  const { locale, pilier, article } = await params;
+  setRequestLocale(locale);
+  const a = getArticle(locale, article);
   // Garde : slug inconnu OU pilier de l'URL incohérent avec l'article → 404.
   if (!a || a.pillarSlug !== pilier) notFound();
 
-  const Body = ARTICLE_BODIES[a.slug];
+  const Body = getArticleBody(locale, a.slug);
   if (!Body) notFound();
 
   return <ArticleShell article={a}>{Body(a)}</ArticleShell>;

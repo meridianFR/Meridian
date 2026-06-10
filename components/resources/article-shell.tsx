@@ -2,20 +2,30 @@
 // Compose : fil d'Ariane → en-tête → corps (children) → pont produit → FAQ →
 // disclaimer → « À lire ensuite ». Injecte le JSON-LD Article + Breadcrumb + FAQ.
 
-import Link from "next/link";
+import { useLocale, useTranslations } from "next-intl";
 import type { ReactNode } from "react";
+import { Link } from "@/i18n/navigation";
 import {
   BASE_URL,
-  INTENT_LABEL,
   getPillar,
   relatedArticles,
   type Article,
+  type Intent,
 } from "@/lib/resources";
 import { Breadcrumb, Disclaimer, Faq, ProductBridge, RelatedArticles } from "./blocks";
 
-function formatDate(iso: string): string {
+const INLANG: Record<string, string> = { fr: "fr-FR", en: "en-US", pt: "pt-PT" };
+const INTENT_KEY: Record<Intent, "intentInfo" | "intentComm" | "intentTrans"> = {
+  info: "intentInfo",
+  comm: "intentComm",
+  trans: "intentTrans",
+};
+
+function formatDate(iso: string, locale: string): string {
   try {
-    return new Intl.DateTimeFormat("fr-FR", { dateStyle: "long" }).format(new Date(iso));
+    return new Intl.DateTimeFormat(INLANG[locale] ?? "fr-FR", { dateStyle: "long" }).format(
+      new Date(iso),
+    );
   } catch {
     return iso;
   }
@@ -25,8 +35,8 @@ function articleHref(a: Article): string {
   return `/ressources/${a.pillarSlug}/${a.slug}`;
 }
 
-function buildJsonLd(article: Article) {
-  const pillar = getPillar(article.pillarSlug);
+function buildJsonLd(article: Article, locale: string, resourcesLabel: string) {
+  const pillar = getPillar(locale, article.pillarSlug);
   const url = `${BASE_URL}${articleHref(article)}`;
 
   const graph: Record<string, unknown>[] = [
@@ -35,7 +45,7 @@ function buildJsonLd(article: Article) {
       "@id": `${url}#article`,
       headline: article.metaTitle ?? article.title,
       description: article.description,
-      inLanguage: "fr-FR",
+      inLanguage: INLANG[locale] ?? "fr-FR",
       datePublished: article.updated,
       dateModified: article.updated,
       mainEntityOfPage: url,
@@ -48,7 +58,7 @@ function buildJsonLd(article: Article) {
       "@type": "BreadcrumbList",
       "@id": `${url}#breadcrumb`,
       itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Ressources", item: `${BASE_URL}/ressources` },
+        { "@type": "ListItem", position: 1, name: resourcesLabel, item: `${BASE_URL}/ressources` },
         ...(pillar
           ? [
               {
@@ -80,19 +90,22 @@ function buildJsonLd(article: Article) {
 }
 
 export function ArticleShell({ article, children }: { article: Article; children: ReactNode }) {
-  const pillar = getPillar(article.pillarSlug);
-  const related = relatedArticles(article).map((a) => ({
+  const t = useTranslations("Resources");
+  const locale = useLocale();
+  const resourcesLabel = t("resourcesFallback");
+  const pillar = getPillar(locale, article.pillarSlug);
+  const related = relatedArticles(locale, article).map((a) => ({
     href: articleHref(a),
     title: a.title,
     description: a.description,
-    pillar: getPillar(a.pillarSlug)?.title ?? "Ressources",
+    pillar: getPillar(locale, a.pillarSlug)?.title ?? resourcesLabel,
   }));
 
   return (
     <main className="relative pt-32 pb-24">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(buildJsonLd(article)) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(buildJsonLd(article, locale, resourcesLabel)) }}
       />
 
       <article>
@@ -101,7 +114,7 @@ export function ArticleShell({ article, children }: { article: Article; children
           <div className="max-w-[44rem] mx-auto">
             <Breadcrumb
               items={[
-                { href: "/ressources", label: "Ressources" },
+                { href: "/ressources", label: resourcesLabel },
                 ...(pillar ? [{ href: `/ressources/${pillar.slug}`, label: pillar.title }] : []),
                 { label: article.title },
               ]}
@@ -119,11 +132,11 @@ export function ArticleShell({ article, children }: { article: Article; children
             <h1 className="h-title text-4xl md:text-5xl lg:text-[56px] mb-6">{article.title}</h1>
 
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mono text-[11px] uppercase tracking-[0.15em] text-ink-faint">
-              <span>{article.readingMinutes} min de lecture</span>
+              <span>{t("readingMinutes", { min: article.readingMinutes })}</span>
               <span aria-hidden className="text-border-2">·</span>
-              <span>Mis à jour le {formatDate(article.updated)}</span>
+              <span>{t("updatedOn", { date: formatDate(article.updated, locale) })}</span>
               <span aria-hidden className="text-border-2">·</span>
-              <span className="pill">{INTENT_LABEL[article.intent]}</span>
+              <span className="pill">{t(INTENT_KEY[article.intent])}</span>
             </div>
           </div>
         </header>
@@ -149,7 +162,7 @@ export function ArticleShell({ article, children }: { article: Article; children
             href={`/ressources/${pillar.slug}`}
             className="mono text-[11px] uppercase tracking-widest text-ink-mute hover:text-white transition"
           >
-            ← Retour au guide : {pillar.title}
+            {t("backToGuide", { title: pillar.title })}
           </Link>
         </div>
       )}
