@@ -880,5 +880,10 @@
     "intentInfo": "Informational",
     "intentComm": "Commercial",
     "intentTrans": "Transactional"
+  },
+  "Meta": {
+    "defaultTitle": "Meridian ° — Trade what you measure.",
+    "description": "Tools and strategies for traders who want to last, not blow up. No profit promise. No signals. No guru.",
+    "ogDescription": "Tools and strategies for traders who want to last, not blow up."
   }
 }

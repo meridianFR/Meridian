@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { alternatesFor } from "@/i18n/seo";
 import { allArticleParams, getArticle } from "@/lib/resources";
 import { ArticleShell } from "@/components/resources/article-shell";
 import { getArticleBody } from "@/components/resources/bodies";
@@ -18,15 +19,15 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     const t = await getTranslations({ locale, namespace: "Resources" });
     return { title: t("notFoundArticle") };
   }
-  const url = `/ressources/${a.pillarSlug}/${a.slug}`;
+  const path = `/ressources/${a.pillarSlug}/${a.slug}`;
   return {
     title: a.metaTitle ?? a.title,
     description: a.description,
-    alternates: { canonical: url },
+    alternates: alternatesFor(locale, path),
     openGraph: {
       title: a.metaTitle ?? a.title,
       description: a.description,
-      url,
+      url: path,
       type: "article",
     },
   };

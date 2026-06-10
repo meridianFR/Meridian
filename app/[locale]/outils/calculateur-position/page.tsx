@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
+import { alternatesFor } from "@/i18n/seo";
 import { Reveal } from "@/components/reveal";
 import { Calculator } from "./Calculator";
 
@@ -12,7 +13,7 @@ export async function generateMetadata({
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Calc" });
   return {
-    alternates: { canonical: "/outils/calculateur-position" },
+    alternates: alternatesFor(locale, "/outils/calculateur-position"),
     title: t("metaTitle"),
     description: t("metaDescription"),
     openGraph: {

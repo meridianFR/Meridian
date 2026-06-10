@@ -1,5 +1,7 @@
+import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
+import { alternatesFor } from "@/i18n/seo";
 import { STRATEGIES } from "@/lib/strategies";
 import { AmbientOrbs } from "@/components/ambient-orbs";
 import { HeroChart } from "@/components/hero-chart";
@@ -16,9 +18,14 @@ import {
   FormationShowcase,
 } from "@/components/showcase-visuals";
 
-export const metadata = {
-  alternates: { canonical: "/" },
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  return { alternates: alternatesFor(locale, "/") };
+}
 
 // Piliers : visuel + lien fixes, libellés tirés des traductions.
 const PILLARS = [

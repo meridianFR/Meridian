@@ -880,5 +880,10 @@
     "intentInfo": "Informacional",
     "intentComm": "Comercial",
     "intentTrans": "Transacional"
+  },
+  "Meta": {
+    "defaultTitle": "Meridian ° — Faz trading do que medes.",
+    "description": "Ferramentas e estratégias para traders que querem durar, não rebentar. Nenhuma promessa de ganho. Nenhum sinal. Nenhum guru.",
+    "ogDescription": "Ferramentas e estratégias para traders que querem durar, não rebentar."
   }
 }

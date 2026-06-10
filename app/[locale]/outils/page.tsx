@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
+import { alternatesFor } from "@/i18n/seo";
 import { Reveal } from "@/components/reveal";
 
 export async function generateMetadata({
@@ -11,7 +12,7 @@ export async function generateMetadata({
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Tools" });
   return {
-    alternates: { canonical: "/outils" },
+    alternates: alternatesFor(locale, "/outils"),
     title: t("metaTitle"),
     description: t("metaDescription"),
   };

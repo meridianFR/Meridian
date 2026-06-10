@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
+import { alternatesFor } from "@/i18n/seo";
 import {
   articlesForPillar,
   getArticles,
@@ -20,7 +21,7 @@ export async function generateMetadata({
   return {
     title: t("metaTitle"),
     description: t("metaDescription"),
-    alternates: { canonical: "/ressources" },
+    alternates: alternatesFor(locale, "/ressources"),
     openGraph: {
       title: t("ogTitle"),
       description: t("ogDescription"),
