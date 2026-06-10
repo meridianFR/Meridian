@@ -1,5 +1,6 @@
-import Link from "next/link";
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 import { AmbientOrbs } from "@/components/ambient-orbs";
 import { Reveal } from "@/components/reveal";
 import { FaqAccordion, type FaqItem } from "@/components/faq-accordion";
@@ -15,14 +16,24 @@ import {
   LockIcon,
 } from "@/components/journal-logos";
 
-export const metadata: Metadata = {
-  alternates: { canonical: "/journal" },
-  title: "Meridian Journal — analyse ton comportement de trader",
-  description:
-    "Le journal de trading qui transforme ton historique MT4/MT5 en décisions : erreurs récurrentes chiffrées en R, statut de tes setups, Weekly Report comportemental chaque dimanche. 19 €/mois, sans engagement.",
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "JournalSales" });
+  return {
+    alternates: { canonical: "/journal" },
+    title: t("metaTitle"),
+    description: t("metaDescription"),
+  };
+}
 
 const APP_HREF = "/journal-preview";
+
+/** Traducteur simplifié passé aux sous-composants (le rendu est côté serveur). */
+type Tx = (key: string, values?: Record<string, string | number>) => string;
 
 /* ------------------------------------------------------------------ données simulées (compte de démonstration, déterministe, tout en R) */
 
@@ -166,6 +177,7 @@ function RVal({ v, className = "" }: { v: number; className?: string }) {
   return <span className={`mono ${v >= 0 ? "text-edge" : "text-risk"} ${className}`}>{fmtR(v)}</span>;
 }
 
+// Statut interne (stable, sert de clé) → clé de traduction pour l'affichage.
 const setupStatut = (r: number) =>
   r >= 20 ? "Prioritaire" : r >= 5 ? "Solide" : r >= -5 ? "À surveiller" : "À retirer";
 const statutClass: Record<string, string> = {
@@ -173,6 +185,17 @@ const statutClass: Record<string, string> = {
   Solide: "text-ink",
   "À surveiller": "text-ink-mute",
   "À retirer": "text-risk",
+};
+const STATUT_KEY: Record<string, string> = {
+  Prioritaire: "statPrioritaire",
+  Solide: "statSolide",
+  "À surveiller": "statSurveiller",
+  "À retirer": "statRetirer",
+};
+const TAG_KEY: Record<string, string> = {
+  "Revenge trade": "tagRevenge",
+  "Sortie prématurée": "tagEarlyExit",
+  "Position traînée": "tagDragged",
 };
 
 /* ------------------------------------------------------------------ visuels */
@@ -247,14 +270,15 @@ function TradeRBars({ trades, className = "h-20" }: { trades: Sim[]; className?:
   );
 }
 
-function DashboardHero() {
+function DashboardHero({ t }: { t: Tx }) {
   const kpis = [
-    { k: "R cumulé · 90j", v: fmtR(D.total), tone: "edge" },
-    { k: "Winrate", v: `${D.winrate} %`, tone: "" },
-    { k: "Expectancy", v: fmtR(D.expectancy), tone: "edge" },
-    { k: "Profit factor", v: D.profitFactor.toFixed(2), tone: "" },
-    { k: "Drawdown max", v: `-${D.maxDD.toFixed(1)}R`, tone: "risk" },
+    { k: t("kpiCumR90"), v: fmtR(D.total), tone: "edge" },
+    { k: t("kpiWinrate"), v: `${D.winrate} %`, tone: "" },
+    { k: t("kpiExpectancy"), v: fmtR(D.expectancy), tone: "edge" },
+    { k: t("kpiProfitFactor"), v: D.profitFactor.toFixed(2), tone: "" },
+    { k: t("kpiMaxDD"), v: `-${D.maxDD.toFixed(1)}R`, tone: "risk" },
   ];
+  const tabs = [t("tabDashboard"), t("tabTrades"), t("tabPerformance"), t("tabWeekly")];
   return (
     <div className="glow-border glow-border-live rounded-2xl bg-black/50 backdrop-blur-sm overflow-hidden">
       <div className="flex items-center justify-between gap-4 px-5 py-3.5 border-b border-border">
@@ -263,16 +287,16 @@ function DashboardHero() {
             Meridian<span className="text-ink-muted">°</span> Journal
           </span>
           <span className="mono text-[9px] uppercase tracking-[0.2em] text-ink-faint hidden sm:inline">
-            compte démo
+            {t("demoAccount")}
           </span>
         </div>
         <div className="hidden md:flex items-center gap-1 mono text-[10px] uppercase tracking-[0.15em]">
-          {["Dashboard", "Trades", "Performance", "Weekly"].map((t, i) => (
+          {tabs.map((tab, i) => (
             <span
-              key={t}
+              key={tab}
               className={`px-2.5 py-1 rounded-full ${i === 0 ? "bg-white/10 text-white" : "text-ink-faint"}`}
             >
-              {t}
+              {tab}
             </span>
           ))}
         </div>
@@ -297,28 +321,28 @@ function DashboardHero() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-px bg-border">
         <div className="lg:col-span-2 bg-black p-5">
           <div className="flex items-center justify-between mb-3">
-            <span className="mono text-[10px] uppercase tracking-[0.25em] text-ink-faint">Equity cumulée · R</span>
-            <span className="mono text-[10px] text-ink-faint">{D.n} trades</span>
+            <span className="mono text-[10px] uppercase tracking-[0.25em] text-ink-faint">{t("equityCumR")}</span>
+            <span className="mono text-[10px] text-ink-faint">{t("nTrades", { n: D.n })}</span>
           </div>
           <EquityCurve data={D.equity} gid="hero" className="h-44 md:h-56" />
         </div>
         <div className="bg-black p-5">
-          <div className="mono text-[10px] uppercase tracking-[0.25em] text-ink-faint mb-3.5">Derniers trades</div>
+          <div className="mono text-[10px] uppercase tracking-[0.25em] text-ink-faint mb-3.5">{t("lastTrades")}</div>
           <div className="space-y-2.5">
-            {D.recent.slice(0, 6).map((t) => (
-              <div key={t.i} className="flex items-center justify-between gap-2">
-                <span className="mono text-[11px] text-white w-14 shrink-0">{t.sym}</span>
+            {D.recent.slice(0, 6).map((tr) => (
+              <div key={tr.i} className="flex items-center justify-between gap-2">
+                <span className="mono text-[11px] text-white w-14 shrink-0">{tr.sym}</span>
                 <span
                   className={`mono text-[9px] px-1.5 py-0.5 rounded shrink-0 ${
-                    t.side === "L" ? "text-edge bg-edge/10" : "text-risk bg-risk/10"
+                    tr.side === "L" ? "text-edge bg-edge/10" : "text-risk bg-risk/10"
                   }`}
                 >
-                  {t.side}
+                  {tr.side}
                 </span>
                 <span className="mono text-[9px] uppercase tracking-[0.1em] text-ink-faint flex-1 text-right">
-                  {t.conform ? "conf." : "écart"}
+                  {tr.conform ? t("confShort") : t("ecartShort")}
                 </span>
-                <RVal v={t.r} className="text-[12px] w-12 text-right shrink-0" />
+                <RVal v={tr.r} className="text-[12px] w-12 text-right shrink-0" />
               </div>
             ))}
           </div>
@@ -350,7 +374,7 @@ function InstrumentBars() {
   );
 }
 
-function HourBars() {
+function HourBars({ t }: { t: Tx }) {
   const max = Math.max(...D.byHour.map((x) => Math.abs(x.exp)), 0.4);
   return (
     <div>
@@ -374,17 +398,17 @@ function HourBars() {
       </div>
       <div className="flex items-center justify-between mono text-[9px] uppercase tracking-[0.15em] text-ink-faint mt-4">
         <span>
-          Matin <RVal v={D.mornExp} className="text-[10px]" />
+          {t("morning")} <RVal v={D.mornExp} className="text-[10px]" />
         </span>
         <span>
-          Après 15h <RVal v={D.aftExp} className="text-[10px]" />
+          {t("afternoon")} <RVal v={D.aftExp} className="text-[10px]" />
         </span>
       </div>
     </div>
   );
 }
 
-function SetupBars() {
+function SetupBars({ t }: { t: Tx }) {
   const max = Math.max(...D.bySetup.map((s) => Math.abs(s.r)), 1);
   return (
     <div className="space-y-3.5">
@@ -409,7 +433,7 @@ function SetupBars() {
               <span
                 className={`mono text-[9px] uppercase tracking-[0.15em] shrink-0 w-[88px] text-right ${statutClass[statut]}`}
               >
-                {statut}
+                {t(STATUT_KEY[statut])}
               </span>
             </div>
           </div>
@@ -419,42 +443,42 @@ function SetupBars() {
   );
 }
 
-function TradesPanel() {
+function TradesPanel({ t }: { t: Tx }) {
   return (
     <div className="space-y-3">
-      {D.recent.map((t) => (
-        <div key={t.i} className="flex items-center gap-3 text-[12px]">
-          <span className="mono text-white w-16 shrink-0">{t.sym}</span>
+      {D.recent.map((tr) => (
+        <div key={tr.i} className="flex items-center gap-3 text-[12px]">
+          <span className="mono text-white w-16 shrink-0">{tr.sym}</span>
           <span
             className={`mono text-[10px] px-1.5 py-0.5 rounded shrink-0 ${
-              t.side === "L" ? "text-edge bg-edge/10" : "text-risk bg-risk/10"
+              tr.side === "L" ? "text-edge bg-edge/10" : "text-risk bg-risk/10"
             }`}
           >
-            {t.side === "L" ? "Long" : "Short"}
+            {tr.side === "L" ? t("long") : t("short")}
           </span>
-          <span className="text-ink-mute truncate flex-1 hidden sm:block">{t.setup}</span>
+          <span className="text-ink-mute truncate flex-1 hidden sm:block">{tr.setup}</span>
           <span
             className={`mono text-[10px] uppercase tracking-[0.1em] shrink-0 ${
-              t.conform ? "text-ink-faint" : "text-risk"
+              tr.conform ? "text-ink-faint" : "text-risk"
             }`}
           >
-            {t.conform ? "Conforme" : "Écart"}
+            {tr.conform ? t("conforme") : t("ecart")}
           </span>
-          <RVal v={t.r} className="text-[13px] w-12 text-right shrink-0" />
+          <RVal v={tr.r} className="text-[13px] w-12 text-right shrink-0" />
         </div>
       ))}
     </div>
   );
 }
 
-function ErreurRows() {
+function ErreurRows({ t }: { t: Tx }) {
   return (
     <div className="space-y-2.5">
       {D.byTag.map((e) => (
         <div key={e.tag} className="flex items-center justify-between gap-4">
           <div className="min-w-0">
-            <div className="text-[13px] text-white truncate">{e.tag}</div>
-            <div className="mono text-[10px] text-ink-faint">{e.n} trades</div>
+            <div className="text-[13px] text-white truncate">{t(TAG_KEY[e.tag])}</div>
+            <div className="mono text-[10px] text-ink-faint">{t("nTrades", { n: e.n })}</div>
           </div>
           <RVal v={e.r} className="text-sm shrink-0" />
         </div>
@@ -467,126 +491,49 @@ const HEAT = [3, 3, 2, 0, 3, 1, 0, 3, 2, 3, 3, 2, 0, 0, 1, 3, 3, 0, 2, 3, 3, 0, 
 const heatColor = (v: number) =>
   v === 0 ? "#151515" : v === 1 ? "rgba(239,68,68,0.5)" : v === 2 ? "#525252" : "rgba(34,197,94,0.6)";
 
-/* ------------------------------------------------------------------ contenu */
-
-const PROBLEMS = [
-  { k: "L'Excel", d: "Tu remplis, tu ne relis jamais. Des colonnes qui s'accumulent, aucune lecture." },
-  { k: "Le track record broker", d: "Une courbe d'equity et un solde. Zéro analyse de ce que tu fais vraiment." },
-  { k: "Les journaux à 40 champs", d: "Trop de friction. Tu abandonnes au bout de huit trades." },
-];
-
-const PILLARS = [
-  {
-    eyebrow: "01 — Tracking",
-    title: "Tes chiffres, en R",
-    desc: "Winrate, expectancy, drawdown, profit factor. En R par défaut. Import broker en trente secondes.",
-  },
-  {
-    eyebrow: "02 — Comportement",
-    title: "Tes erreurs, chiffrées",
-    desc: "Ce que le revenge trade te coûte. Tes heures destructrices. Les patterns que tu ne vois pas seul.",
-  },
-  {
-    eyebrow: "03 — Stratégie",
-    title: "Quoi garder, quoi retirer",
-    desc: "Un statut clair par setup : prioritaire, solide, à retirer. Une décision, pas juste une statistique.",
-  },
-];
-
-const STEPS = [
-  {
-    n: "01",
-    t: "Importe",
-    d: "Glisse ton historique MT4 ou MT5. Deux cents trades lus en trente secondes, le R recalculé depuis ton stop.",
-  },
-  {
-    n: "02",
-    t: "Journalise",
-    d: "Quatre champs par trade : instrument, sens, setup, conformité au plan. Le reste est rempli automatiquement.",
-  },
-  {
-    n: "03",
-    t: "Lis",
-    d: "Dashboard, erreurs récurrentes, Weekly Report. Tu sais quoi ajuster avant la séance suivante.",
-  },
-];
-
-const INCLUS = [
-  "Import MT4 / MT5",
-  "Statistiques en R",
-  "5 vues de performance",
-  "Statut automatique des setups",
-  "12 tags comportement",
-  "Heatmap de conformité",
-  "Insights automatiques",
-  "Weekly Report hebdomadaire",
-  "Jusqu'à 3 comptes",
-  "Export CSV / PDF",
-  "Support email",
-];
-
-const PLATFORMS = [
-  { mark: <MetaTraderLogo variant="4" />, status: "Import CSV · prêt", tone: "edge" as const },
-  { mark: <MetaTraderLogo variant="5" />, status: "Import CSV · prêt", tone: "edge" as const },
-  { mark: <CsvMark />, status: "Fichier · prêt", tone: "edge" as const },
-  { mark: <ApiMark />, status: "À venir · roadmap", tone: "mute" as const },
-];
-
-const PLANS = [
-  {
-    name: "Mensuel",
-    plan: "monthly",
-    price: "19 €",
-    period: "/ mois",
-    sub: "Sans engagement.",
-    perks: ["Tout le Journal, sans limite", "Weekly Report chaque dimanche", "Jusqu'à 3 comptes"],
-    cta: "Essayer le mensuel",
-    primary: false,
-    badge: "",
-  },
-  {
-    name: "Annuel",
-    plan: "annual",
-    price: "190 €",
-    period: "/ an",
-    sub: "Soit 15,83 €/mois.",
-    perks: ["Tout le mensuel", "Deux mois offerts (−17 %)"],
-    cta: "Prendre l'annuel",
-    primary: true,
-    badge: "Deux mois offerts",
-  },
-];
-
-const FAQ: FaqItem[] = [
-  {
-    q: "Pour qui ce n'est PAS ?",
-    a: "Si tu trades deux fois par mois en swing long terme, ce journal est surdimensionné. Si tu cherches des signaux ou un coach, ce n'est pas ici. Meridian Journal est fait pour les traders actifs qui veulent mesurer et corriger.",
-  },
-  {
-    q: "Ça marche avec quel broker ?",
-    a: "MT4 et MT5, via l'export d'historique standard — donc la quasi-totalité des brokers. Un import CSV générique couvre le reste. L'API directe est en roadmap.",
-  },
-  {
-    q: "Mes données sont-elles en sécurité ?",
-    a: "Hébergement dans l'Union européenne, données chiffrées, jamais revendues. Export et suppression complète à tout moment.",
-  },
-  {
-    q: "Est-ce que ça va me rendre rentable ?",
-    a: "Non. Aucun outil ne rend rentable. Le Journal te montre tes patterns et ce que tes erreurs te coûtent, en R. Ce que tu en fais t'appartient.",
-  },
-  {
-    q: "Combien de temps par jour ?",
-    a: "Environ trente secondes par trade, et dix à quinze minutes de revue le dimanche. C'est tout.",
-  },
-  {
-    q: "Et si j'arrête ?",
-    a: "Résiliation en un clic, sans justification. Tu repars avec un export complet de tes données.",
-  },
-];
-
 /* ------------------------------------------------------------------ page */
 
-export default function JournalMarketing() {
+export default async function JournalMarketing() {
+  const t = await getTranslations("JournalSales");
+  const problems = t.raw("problems") as { k: string; d: string }[];
+  const pillars = t.raw("pillars") as { eyebrow: string; title: string; desc: string }[];
+  const weeklyItems = t.raw("weeklyItems") as { t: string; d: string }[];
+  const steps = t.raw("steps") as { n: string; t: string; d: string }[];
+  const faq = t.raw("faq") as FaqItem[];
+  const included = t.raw("included") as string[];
+
+  const platforms = [
+    { mark: <MetaTraderLogo variant="4" />, status: t("platReadyCsv"), tone: "edge" as const },
+    { mark: <MetaTraderLogo variant="5" />, status: t("platReadyCsv"), tone: "edge" as const },
+    { mark: <CsvMark />, status: t("platReadyFile"), tone: "edge" as const },
+    { mark: <ApiMark />, status: t("platSoon"), tone: "mute" as const },
+  ];
+
+  const plans = [
+    {
+      name: t("planMonthlyName"),
+      plan: "monthly",
+      price: "19 €",
+      period: t("planMonthlyPeriod"),
+      sub: t("planMonthlySub"),
+      perks: t.raw("planMonthlyPerks") as string[],
+      cta: t("planMonthlyCta"),
+      primary: false,
+      badge: "",
+    },
+    {
+      name: t("planAnnualName"),
+      plan: "annual",
+      price: "190 €",
+      period: t("planAnnualPeriod"),
+      sub: t("planAnnualSub"),
+      perks: t.raw("planAnnualPerks") as string[],
+      cta: t("planAnnualCta"),
+      primary: true,
+      badge: t("planAnnualBadge"),
+    },
+  ];
+
   return (
     <main className="relative min-h-screen">
       {/* 1 — HERO + grand visuel dashboard */}
@@ -602,36 +549,34 @@ export default function JournalMarketing() {
         <div className="max-w-wrap mx-auto px-6 sm:px-10 relative">
           <div className="max-w-3xl">
             <div className="mono text-[10px] uppercase tracking-[0.4em] text-ink-faint mb-6 fade-in">
-              ° Meridian Journal
+              {t("heroEyebrow")}
             </div>
             <h1 className="h-title text-[38px] sm:text-[52px] md:text-[62px] lg:text-[68px] fade-in-up">
-              Trade ce que tu mesures.
+              {t("heroTitle1")}
               <br />
-              <span className="shimmer">Mesure ce que tu trades.</span>
+              <span className="shimmer">{t("heroTitle2")}</span>
             </h1>
             <p className="text-ink-mute text-base md:text-lg max-w-xl mt-6 leading-relaxed fade-in-up-2">
-              Le journal qui transforme ton historique de trades en décisions : quel setup garder,
-              quelle erreur te coûte le plus, à quelle heure tu détruis ton edge. Pas un track record
-              de plus.
+              {t("heroIntro")}
             </p>
             <div className="flex flex-wrap gap-3 mt-8 fade-in-up-3">
-              <Link href="#tarifs" className="btn btn-primary">
-                Essayer le Journal — 19 €/mois
-              </Link>
+              <a href="#tarifs" className="btn btn-primary">
+                {t("heroCta1")}
+              </a>
               <Link href={APP_HREF} className="btn btn-ghost">
-                Voir la démo
+                {t("heroCta2")}
               </Link>
             </div>
             <div className="mono text-[10px] uppercase tracking-[0.25em] text-ink-faint mt-5 fade-in-up-3">
-              Import MT4 / MT5 · Weekly Report comportemental · sans engagement
+              {t("heroMeta")}
             </div>
           </div>
 
           {/* grand visuel — dashboard complet, compte de démonstration, données en R */}
           <div className="mt-10 md:mt-12 fade-in-up-3">
-            <DashboardHero />
+            <DashboardHero t={t} />
             <div className="mono text-[9px] uppercase tracking-[0.2em] text-ink-faint mt-4 text-center">
-              Aperçu d'un compte de démonstration · toutes les données en R · anonymisées
+              {t("demoCaption")}
             </div>
           </div>
         </div>
@@ -641,15 +586,15 @@ export default function JournalMarketing() {
       <section className="relative py-24 md:py-32 border-t border-border">
         <div className="max-w-wrap mx-auto px-6 sm:px-10">
           <Reveal>
-            <div className="mono text-[10px] uppercase tracking-[0.4em] text-ink-faint mb-5">° Le problème</div>
+            <div className="mono text-[10px] uppercase tracking-[0.4em] text-ink-faint mb-5">{t("problemEyebrow")}</div>
             <h2 className="h-title text-3xl md:text-5xl max-w-3xl mb-14">
-              Ton journal actuel te dit que tu as perdu.
+              {t("problemTitle1")}
               <br />
-              <span className="text-ink-muted">Pas pourquoi.</span>
+              <span className="text-ink-muted">{t("problemTitle2")}</span>
             </h2>
           </Reveal>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-border rounded-2xl overflow-hidden border border-border">
-            {PROBLEMS.map((p, i) => (
+            {problems.map((p, i) => (
               <Reveal key={p.k} delay={i * 120}>
                 <div className="bg-black p-8 md:p-10 h-full">
                   <div className="mono text-[10px] uppercase tracking-[0.3em] text-ink-faint mb-5">0{i + 1}</div>
@@ -661,8 +606,8 @@ export default function JournalMarketing() {
           </div>
           <Reveal delay={120}>
             <p className="text-xl md:text-2xl font-light tracking-tight text-ink mt-12 max-w-3xl">
-              Le problème n'est pas le manque de données.
-              <span className="text-ink-muted"> C'est l'absence de lecture.</span>
+              {t("problemConcl1")}
+              <span className="text-ink-muted">{t("problemConcl2")}</span>
             </p>
           </Reveal>
         </div>
@@ -673,16 +618,16 @@ export default function JournalMarketing() {
         <div className="max-w-wrap mx-auto px-6 sm:px-10">
           <Reveal>
             <div className="mono text-[10px] uppercase tracking-[0.4em] text-ink-faint mb-5">
-              ° Ce que fait Meridian Journal
+              {t("pillarsEyebrow")}
             </div>
             <h2 className="h-title text-3xl md:text-5xl max-w-2xl mb-14">
-              Trois lectures,
+              {t("pillarsTitle1")}
               <br />
-              <span className="shimmer">une décision.</span>
+              <span className="shimmer">{t("pillarsTitle2")}</span>
             </h2>
           </Reveal>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-border rounded-2xl overflow-hidden border border-border">
-            {PILLARS.map((p, i) => (
+            {pillars.map((p, i) => (
               <Reveal key={p.eyebrow} delay={i * 120}>
                 <div className="pillar-card bg-black p-10 md:p-12 h-full">
                   <div className="mono text-[10px] uppercase tracking-[0.35em] text-ink-faint mb-8">{p.eyebrow}</div>
@@ -706,25 +651,24 @@ export default function JournalMarketing() {
         />
         <div className="max-w-wrap mx-auto px-6 sm:px-10">
           <Reveal>
-            <div className="mono text-[10px] uppercase tracking-[0.4em] text-ink-faint mb-5">° Aperçu — Dashboard</div>
+            <div className="mono text-[10px] uppercase tracking-[0.4em] text-ink-faint mb-5">{t("s4Eyebrow")}</div>
             <h2 className="h-title text-3xl md:text-5xl max-w-2xl mb-6">
-              Une courbe construite
+              {t("s4Title1")}
               <br />
-              <span className="shimmer">trade par trade.</span>
+              <span className="shimmer">{t("s4Title2")}</span>
             </h2>
             <p className="text-ink-mute text-base leading-relaxed max-w-2xl mb-12">
-              Tu importes ton historique, le R est recalculé depuis ton stop, et chaque trade vient
-              nourrir ta courbe d'equity. Pas un euro affiché — uniquement des multiples de risque.
+              {t("s4Intro")}
             </p>
           </Reveal>
           <Reveal delay={120}>
             <div className="glow-border rounded-2xl bg-black/40 backdrop-blur-sm p-6 md:p-8">
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-border rounded-xl overflow-hidden border border-border mb-6">
                 {[
-                  { k: "R cumulé", v: fmtR(D.total), tone: "edge" },
-                  { k: "Winrate", v: `${D.winrate} %`, tone: "" },
-                  { k: "Expectancy", v: fmtR(D.expectancy), tone: "edge" },
-                  { k: "Profit factor", v: D.profitFactor.toFixed(2), tone: "" },
+                  { k: t("kpiCumR"), v: fmtR(D.total), tone: "edge" },
+                  { k: t("kpiWinrate"), v: `${D.winrate} %`, tone: "" },
+                  { k: t("kpiExpectancy"), v: fmtR(D.expectancy), tone: "edge" },
+                  { k: t("kpiProfitFactor"), v: D.profitFactor.toFixed(2), tone: "" },
                 ].map((s) => (
                   <div key={s.k} className="bg-black px-4 py-3">
                     <div className="mono text-[9px] uppercase tracking-[0.2em] text-ink-faint">{s.k}</div>
@@ -734,10 +678,10 @@ export default function JournalMarketing() {
                   </div>
                 ))}
               </div>
-              <div className="mono text-[10px] uppercase tracking-[0.25em] text-ink-faint mb-2">Equity cumulée · R</div>
+              <div className="mono text-[10px] uppercase tracking-[0.25em] text-ink-faint mb-2">{t("equityCumR")}</div>
               <EquityCurve data={D.equity} gid="tour" className="h-40 md:h-52" />
               <div className="mono text-[10px] uppercase tracking-[0.25em] text-ink-faint mt-7 mb-2">
-                Chaque barre, un trade · {D.n} trades
+                {t("eachBarTrade", { n: D.n })}
               </div>
               <TradeRBars trades={SIM} className="h-16 md:h-20" />
             </div>
@@ -749,22 +693,21 @@ export default function JournalMarketing() {
       <section className="relative py-24 md:py-32 border-t border-border">
         <div className="max-w-wrap mx-auto px-6 sm:px-10">
           <Reveal>
-            <div className="mono text-[10px] uppercase tracking-[0.4em] text-ink-faint mb-5">° Aperçu — Performance</div>
+            <div className="mono text-[10px] uppercase tracking-[0.4em] text-ink-faint mb-5">{t("s5Eyebrow")}</div>
             <h2 className="h-title text-3xl md:text-5xl max-w-2xl mb-6">
-              Là où tu gagnes.
+              {t("s5Title1")}
               <br />
-              <span className="text-ink-muted">Là où tu rends.</span>
+              <span className="text-ink-muted">{t("s5Title2")}</span>
             </h2>
             <p className="text-ink-mute text-base leading-relaxed max-w-2xl mb-12">
-              Cinq vues de performance. Par instrument, par heure, par setup. Tu vois en un regard ce
-              qui porte ton edge — et ce qui le grignote.
+              {t("s5Intro")}
             </p>
           </Reveal>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-border rounded-2xl overflow-hidden border border-border">
             <Reveal>
               <div className="bg-black p-7 md:p-8 h-full">
                 <div className="mono text-[10px] uppercase tracking-[0.25em] text-ink-faint mb-6">
-                  Performance par instrument · R
+                  {t("perfByInstrument")}
                 </div>
                 <InstrumentBars />
               </div>
@@ -772,9 +715,9 @@ export default function JournalMarketing() {
             <Reveal delay={120}>
               <div className="bg-black p-7 md:p-8 h-full">
                 <div className="mono text-[10px] uppercase tracking-[0.25em] text-ink-faint mb-6">
-                  Expectancy par heure · R
+                  {t("expectancyByHour")}
                 </div>
-                <HourBars />
+                <HourBars t={t} />
               </div>
             </Reveal>
           </div>
@@ -794,16 +737,15 @@ export default function JournalMarketing() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
             <Reveal as="div" className="lg:col-span-5">
               <div className="mono text-[10px] uppercase tracking-[0.4em] text-ink-faint mb-5">
-                ° Aperçu — Comportement
+                {t("s6Eyebrow")}
               </div>
               <h2 className="h-title text-3xl md:text-5xl mb-6">
-                Ton journal devrait te dire
+                {t("s6Title1")}
                 <br />
-                <span className="shimmer">quoi arrêter de faire.</span>
+                <span className="shimmer">{t("s6Title2")}</span>
               </h2>
               <p className="text-ink-mute text-base leading-relaxed max-w-md">
-                Douze tags comportement, une heatmap de conformité, des insights automatiques. Les
-                erreurs qui reviennent, chiffrées en R, et les créneaux où ton edge s'effondre.
+                {t("s6Intro")}
               </p>
             </Reveal>
 
@@ -812,29 +754,31 @@ export default function JournalMarketing() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div className="rounded-xl border border-border bg-black p-5">
                     <div className="mono text-[10px] uppercase tracking-[0.25em] text-ink-faint mb-4">
-                      Tes erreurs récurrentes
+                      {t("recurringErrors")}
                     </div>
-                    <ErreurRows />
+                    <ErreurRows t={t} />
                   </div>
                   <div className="rounded-xl border border-border bg-black p-5">
                     <div className="mono text-[10px] uppercase tracking-[0.25em] text-ink-faint mb-4">
-                      Conformité · 7 semaines
+                      {t("conformity7w")}
                     </div>
                     <div className="flex flex-wrap gap-[3px]">
                       {HEAT.map((v, i) => (
                         <span key={i} className="w-3.5 h-3.5 rounded-[2px]" style={{ background: heatColor(v) }} />
                       ))}
                     </div>
-                    <div className="mono text-[10px] text-ink-faint mt-4">Conformité moyenne · {D.conform} %</div>
+                    <div className="mono text-[10px] text-ink-faint mt-4">{t("avgConformity", { pct: D.conform })}</div>
                   </div>
                 </div>
                 <div className="mt-5 rounded-xl border border-border bg-black p-5">
                   <div className="mono text-[10px] uppercase tracking-[0.25em] text-ink-faint mb-2">
-                    Insight automatique
+                    {t("autoInsight")}
                   </div>
                   <p className="text-sm text-ink leading-relaxed">
-                    Ton expectancy passe de <RVal v={D.mornExp} /> avant midi à <RVal v={D.aftExp} /> après 15h.
-                    Ton edge se concentre le matin — l'après-midi, il s'efface.
+                    {t.rich("insightText", {
+                      morn: () => <RVal v={D.mornExp} />,
+                      aft: () => <RVal v={D.aftExp} />,
+                    })}
                   </p>
                 </div>
               </div>
@@ -847,32 +791,31 @@ export default function JournalMarketing() {
       <section className="relative py-24 md:py-32 border-t border-border">
         <div className="max-w-wrap mx-auto px-6 sm:px-10">
           <Reveal>
-            <div className="mono text-[10px] uppercase tracking-[0.4em] text-ink-faint mb-5">° Aperçu — Décision</div>
+            <div className="mono text-[10px] uppercase tracking-[0.4em] text-ink-faint mb-5">{t("s7Eyebrow")}</div>
             <h2 className="h-title text-3xl md:text-5xl max-w-2xl mb-6">
-              Quoi garder.
+              {t("s7Title1")}
               <br />
-              <span className="shimmer">Quoi retirer.</span>
+              <span className="shimmer">{t("s7Title2")}</span>
             </h2>
             <p className="text-ink-mute text-base leading-relaxed max-w-2xl mb-12">
-              Un statut par setup, calculé sur ton historique réel. Et un journal qui se remplit en
-              quatre champs — le reste sort tout seul.
+              {t("s7Intro")}
             </p>
           </Reveal>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-border rounded-2xl overflow-hidden border border-border">
             <Reveal>
               <div className="bg-black p-7 md:p-8 h-full">
                 <div className="mono text-[10px] uppercase tracking-[0.25em] text-ink-faint mb-6">
-                  Statut des setups
+                  {t("setupStatus")}
                 </div>
-                <SetupBars />
+                <SetupBars t={t} />
               </div>
             </Reveal>
             <Reveal delay={120}>
               <div className="bg-black p-7 md:p-8 h-full">
                 <div className="mono text-[10px] uppercase tracking-[0.25em] text-ink-faint mb-6">
-                  Journal · derniers trades
+                  {t("journalLastTrades")}
                 </div>
-                <TradesPanel />
+                <TradesPanel t={t} />
               </div>
             </Reveal>
           </div>
@@ -884,15 +827,14 @@ export default function JournalMarketing() {
         <div className="max-w-wrap mx-auto px-6 sm:px-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
             <Reveal as="div" className="lg:col-span-5">
-              <div className="mono text-[10px] uppercase tracking-[0.4em] text-ink-faint mb-5">° Chaque dimanche, 20h</div>
+              <div className="mono text-[10px] uppercase tracking-[0.4em] text-ink-faint mb-5">{t("s8Eyebrow")}</div>
               <h2 className="h-title text-3xl md:text-5xl mb-6">
-                Un rapport.
+                {t("s8Title1")}
                 <br />
-                <span className="text-ink-muted">Pas un dashboard de plus.</span>
+                <span className="text-ink-muted">{t("s8Title2")}</span>
               </h2>
               <p className="text-ink-mute text-base leading-relaxed max-w-md">
-                Pendant que tu te reposes, ton journal lit ta semaine. Trois minutes de lecture, une
-                question pour ta revue. C'est ce qui te ramène, chaque dimanche.
+                {t("s8Intro")}
               </p>
             </Reveal>
 
@@ -900,41 +842,22 @@ export default function JournalMarketing() {
               <div className="glow-border rounded-2xl bg-black/40 backdrop-blur-sm overflow-hidden">
                 <div className="px-6 py-4 border-b border-border flex items-center justify-between">
                   <span className="mono text-[11px] text-ink-mute">meridianFR@hotmail.com</span>
-                  <span className="mono text-[10px] uppercase tracking-[0.2em] text-ink-faint">Weekly Report · S21</span>
+                  <span className="mono text-[10px] uppercase tracking-[0.2em] text-ink-faint">{t("weeklyReportTag")}</span>
                 </div>
                 <div className="p-6 md:p-7 space-y-4">
                   <div className="text-lg font-semibold tracking-tight">
-                    Ta semaine 21 — <span className="mono text-edge">+4.2R</span>, et une question sur tes sorties
+                    {t.rich("weeklySubject", {
+                      r: (chunks) => <span className="mono text-edge">{chunks}</span>,
+                    })}
                   </div>
-                  <p className="text-sm text-ink-mute leading-relaxed">Salut Thomas,</p>
-                  {[
-                    {
-                      t: "Ce qui s'est passé",
-                      d: "18 trades, +4.2R cumulés, conformité 78 %. Une semaine propre, portée par le matin.",
-                    },
-                    {
-                      t: "Ce qui a marché",
-                      d: "Tes Breakout NY open : +6.1R sur 7 trades. C'est ton setup le plus net du mois.",
-                    },
-                    {
-                      t: "Ce qui n'a pas marché",
-                      d: "Deux sorties prématurées t'ont coûté −2.3R de manque à gagner sur des trades conformes.",
-                    },
-                    {
-                      t: "Une hypothèse",
-                      d: "Tu sembles couper tes gains quand le trade dépasse +1.5R. La peur de rendre, pas un signal.",
-                    },
-                    {
-                      t: "Une question pour ta revue",
-                      d: "Sur tes 3 meilleurs trades coupés tôt, qu'est-ce que tu ressentais à l'instant où tu as fermé ?",
-                    },
-                  ].map((m) => (
+                  <p className="text-sm text-ink-mute leading-relaxed">{t("weeklyGreeting")}</p>
+                  {weeklyItems.map((m) => (
                     <div key={m.t}>
                       <div className="mono text-[10px] uppercase tracking-[0.25em] text-ink-faint mb-1">{m.t}</div>
                       <p className="text-sm text-ink leading-relaxed">{m.d}</p>
                     </div>
                   ))}
-                  <p className="text-sm text-ink-mute leading-relaxed pt-1">Bonne semaine, Meridian</p>
+                  <p className="text-sm text-ink-mute leading-relaxed pt-1">{t("weeklySignoff")}</p>
                 </div>
               </div>
             </Reveal>
@@ -946,15 +869,15 @@ export default function JournalMarketing() {
       <section className="relative py-24 md:py-32 border-t border-border">
         <div className="max-w-wrap mx-auto px-6 sm:px-10">
           <Reveal>
-            <div className="mono text-[10px] uppercase tracking-[0.4em] text-ink-faint mb-5">° Comment ça marche</div>
+            <div className="mono text-[10px] uppercase tracking-[0.4em] text-ink-faint mb-5">{t("s9Eyebrow")}</div>
             <h2 className="h-title text-3xl md:text-5xl max-w-2xl mb-14">
-              Trois étapes,
+              {t("s9Title1")}
               <br />
-              <span className="shimmer">zéro friction.</span>
+              <span className="shimmer">{t("s9Title2")}</span>
             </h2>
           </Reveal>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-border rounded-2xl overflow-hidden border border-border">
-            {STEPS.map((s, i) => (
+            {steps.map((s, i) => (
               <Reveal key={s.n} delay={i * 120}>
                 <div className="bg-black p-10 md:p-12 h-full">
                   <div className="mono text-3xl text-ink-faint mb-6">{s.n}</div>
@@ -971,16 +894,14 @@ export default function JournalMarketing() {
       <section className="relative py-20 md:py-28 border-t border-border">
         <div className="max-w-wrap mx-auto px-6 sm:px-10">
           <Reveal>
-            <div className="mono text-[10px] uppercase tracking-[0.4em] text-ink-faint mb-5">° Compatibilité</div>
-            <h2 className="h-title text-3xl md:text-5xl max-w-3xl mb-6">Compatible avec ce que tu trades déjà.</h2>
+            <div className="mono text-[10px] uppercase tracking-[0.4em] text-ink-faint mb-5">{t("s10Eyebrow")}</div>
+            <h2 className="h-title text-3xl md:text-5xl max-w-3xl mb-6">{t("s10Title")}</h2>
             <p className="text-ink-mute text-base leading-relaxed max-w-2xl mb-12">
-              MetaTrader 4 et MetaTrader 5 couvrent la quasi-totalité des brokers. Tu exportes ton
-              historique, tu le déposes dans le Journal, le R est recalculé depuis ton stop. Aucune
-              connexion à ton compte, aucun mot de passe.
+              {t("s10Intro")}
             </p>
           </Reveal>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-border rounded-2xl overflow-hidden border border-border">
-            {PLATFORMS.map((p, i) => (
+            {platforms.map((p, i) => (
               <Reveal key={i} delay={i * 90}>
                 <div className="bg-black p-7 h-full flex flex-col justify-between gap-6 min-h-[148px]">
                   {p.mark}
@@ -1003,15 +924,15 @@ export default function JournalMarketing() {
         <div className="max-w-wrap mx-auto px-6 sm:px-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
             <Reveal as="div" className="lg:col-span-4">
-              <div className="mono text-[10px] uppercase tracking-[0.4em] text-ink-faint mb-5">° Questions</div>
+              <div className="mono text-[10px] uppercase tracking-[0.4em] text-ink-faint mb-5">{t("s11Eyebrow")}</div>
               <h2 className="h-title text-3xl md:text-5xl">
-                Les vraies
+                {t("s11Title1")}
                 <br />
-                <span className="text-ink-muted">questions.</span>
+                <span className="text-ink-muted">{t("s11Title2")}</span>
               </h2>
             </Reveal>
             <Reveal as="div" className="lg:col-span-8" delay={120}>
-              <FaqAccordion items={FAQ} />
+              <FaqAccordion items={faq} />
             </Reveal>
           </div>
         </div>
@@ -1028,19 +949,19 @@ export default function JournalMarketing() {
         />
         <div className="max-w-wrap mx-auto px-6 sm:px-10">
           <Reveal>
-            <div className="mono text-[10px] uppercase tracking-[0.4em] text-ink-faint mb-5">° Tarifs</div>
+            <div className="mono text-[10px] uppercase tracking-[0.4em] text-ink-faint mb-5">{t("s12Eyebrow")}</div>
             <h2 className="h-title text-3xl md:text-5xl max-w-2xl mb-4">
-              Deux formules.
+              {t("s12Title1")}
               <br />
-              <span className="shimmer">Le même Journal complet.</span>
+              <span className="shimmer">{t("s12Title2")}</span>
             </h2>
             <p className="text-ink-mute text-base leading-relaxed max-w-2xl mb-14">
-              Mensuel ou annuel, tu as accès à tout. La seule différence, c'est le prix sur l'année.
+              {t("s12Intro")}
             </p>
           </Reveal>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-border rounded-2xl overflow-hidden border border-border max-w-3xl">
-            {PLANS.map((p, i) => (
+            {plans.map((p, i) => (
               <Reveal key={p.name} delay={i * 120}>
                 <div className={`p-8 md:p-10 h-full flex flex-col ${p.primary ? "bg-[#070707]" : "bg-black"}`}>
                   <div className="flex items-center gap-3 mb-6">
@@ -1078,10 +999,10 @@ export default function JournalMarketing() {
             <div className="bg-border rounded-2xl overflow-hidden border border-border mt-px">
               <div className="bg-black p-8 md:p-10">
                 <div className="mono text-[10px] uppercase tracking-[0.3em] text-ink-faint mb-6">
-                  Inclus dans les deux formules
+                  {t("includedTitle")}
                 </div>
                 <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3">
-                  {INCLUS.map((f) => (
+                  {included.map((f) => (
                     <li key={f} className="flex items-start gap-3 text-sm text-ink">
                       <span className="text-edge mono mt-0.5 shrink-0">+</span>
                       {f}
@@ -1096,7 +1017,7 @@ export default function JournalMarketing() {
             <div className="mt-12 flex flex-col items-center gap-5 text-center">
               <div className="inline-flex items-center gap-2 text-ink-mute">
                 <LockIcon className="text-edge" />
-                <span className="text-[13px]">Paiement sécurisé via Stripe</span>
+                <span className="text-[13px]">{t("securePayment")}</span>
               </div>
               <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-3">
                 <VisaMark />
@@ -1107,7 +1028,7 @@ export default function JournalMarketing() {
                 <StripeMark />
               </div>
               <p className="text-ink-mute text-sm mt-1">
-                Sans engagement. Résiliable en un clic. Tes données exportables à tout moment.
+                {t("pricingNote")}
               </p>
             </div>
           </Reveal>
@@ -1126,16 +1047,16 @@ export default function JournalMarketing() {
         <div className="max-w-wrap mx-auto px-6 sm:px-10 text-center">
           <Reveal>
             <h2 className="h-title text-4xl md:text-6xl mb-8">
-              Arrête de deviner.
+              {t("s13Title1")}
               <br />
-              <span className="shimmer">Commence à mesurer.</span>
+              <span className="shimmer">{t("s13Title2")}</span>
             </h2>
             <div className="flex justify-center">
-              <Link href="#tarifs" className="btn btn-primary">
-                Essayer le Journal — 19 €/mois
-              </Link>
+              <a href="#tarifs" className="btn btn-primary">
+                {t("heroCta1")}
+              </a>
             </div>
-            <p className="text-ink-mute text-sm mt-6">Sans engagement. Ton premier Weekly Report sous sept jours.</p>
+            <p className="text-ink-mute text-sm mt-6">{t("finalNote")}</p>
           </Reveal>
         </div>
       </section>
